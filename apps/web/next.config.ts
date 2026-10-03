@@ -1,10 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Servida bajo el sitio padre: onconcat.com/tools (rewrite en concat-site).
+  basePath: "/tools",
   reactStrictMode: true,
   poweredByHeader: false,
   async redirects() {
-    // Sin middleware: "/" va al idioma por defecto.
+    // Sin middleware: "/tools" va al idioma por defecto (basePath se antepone solo).
     return [{ source: "/", destination: "/es", permanent: false }];
   },
   async headers() {
