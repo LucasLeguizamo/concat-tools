@@ -14,6 +14,7 @@ Cliente delgado del mismo catálogo MCP del gateway. Solo lectura. Los comandos 
 - `concat tokens create --name n8n --scope gsc,ga4 --expires 90d` crea un token para n8n/CI (el secreto sale una sola vez por stdout); `tokens list`, `tokens revoke <id>`. No crees tokens sin que el usuario lo pida.
 - Módulos marcados `(beta)` en `concat status` están en beta cerrada: solo funcionan para cuentas de la lista de prueba de Google.
 - Gateway distinto: `--gateway <url>` o `CONCAT_GATEWAY_URL`.
+- CI/automatización sin login: `CONCAT_TOKEN=cgw_…` (token de API creado con `concat tokens create`); tiene prioridad sobre la sesión guardada. No lo imprimas.
 
 ## Uso
 - `concat tools --json` catálogo con `command`, `name` e `inputSchema`. Empieza por aquí.

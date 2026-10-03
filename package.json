@@ -7,6 +7,8 @@
     "build": "pnpm -r --if-present build",
     "test": "pnpm -r --if-present test",
     "lint": "pnpm -r --if-present lint",
-    "typecheck": "pnpm -r --if-present typecheck"
+    "typecheck": "pnpm -r --if-present typecheck",
+    "docs:tools": "pnpm --filter gateway docs:tools",
+    "eval:tasks": "pnpm --filter gateway eval:tasks"
   }
 }

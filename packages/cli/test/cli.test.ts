@@ -354,3 +354,46 @@ describe("login / logout / config", () => {
     expect(await run(["--version"], h.deps)).toBe(0);
   });
 });
+
+describe("CONCAT_TOKEN (token de API para CI)", () => {
+  const TOKEN = `cgw_${"a".repeat(43)}`;
+  const calls = (h: ReturnType<typeof harness>) =>
+    (h.deps.net.fetch as unknown as { calls: Array<{ url: string; init: RequestInit }> }).calls;
+
+  it("usa el token como Bearer sin login, sin credenciales guardadas y sin tocar el refresh", async () => {
+    const h = harness({ creds: null, env: { CONCAT_TOKEN: TOKEN }, routes: [statusRoute([{ id: "gsc", status: "connected" }])] });
+    expect(await run(["status"], h.deps)).toBe(0);
+    const status = calls(h).filter((c) => c.url.endsWith("/api/status"));
+    expect(status).toHaveLength(1);
+    expect((status[0]!.init.headers as Record<string, string>).authorization).toBe(`Bearer ${TOKEN}`);
+    expect(calls(h).some((c) => c.url.includes("/oauth/token"))).toBe(false);
+    expect(h.store.creds).toBeNull();
+  });
+
+  it("el MCP también recibe el token (session.accessToken)", async () => {
+    const h = harness({ creds: null, env: { CONCAT_TOKEN: TOKEN } });
+    const { createCtx } = await import("../src/context.js");
+    const ctx = createCtx(h.deps, GATEWAY, false);
+    expect(await ctx.session.accessToken()).toBe(TOKEN);
+    expect(await ctx.session.accessToken(true)).toBe(TOKEN);
+  });
+
+  it("401 => exit 3 con mensaje propio y sin eco del token", async () => {
+    const h = harness({ creds: null, env: { CONCAT_TOKEN: TOKEN }, routes: [(u) => (u.pathname === "/api/status" ? json({ error: "invalid_token" }, 401) : undefined)] });
+    expect(await run(["status"], h.deps)).toBe(3);
+    const out = h.out.join("");
+    expect(out).toContain("CONCAT_TOKEN");
+    expect(out).not.toContain(TOKEN);
+  });
+
+  it("formato inválido => exit 2 sin imprimir el valor", async () => {
+    const h = harness({ env: { CONCAT_TOKEN: "ya29.secreto-que-no-debe-salir" }, routes: [statusRoute([])] });
+    expect(await run(["status"], h.deps)).toBe(2);
+    expect(h.out.join("") + h.err.join("")).not.toContain("ya29");
+  });
+
+  it("sin CONCAT_TOKEN y sin sesión => exit 3 (comportamiento previo)", async () => {
+    const h = harness({ creds: null, routes: [statusRoute([])] });
+    expect(await run(["status"], h.deps)).toBe(3);
+  });
+});

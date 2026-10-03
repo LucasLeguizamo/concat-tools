@@ -10,6 +10,7 @@ import { z } from "zod";
 import { authenticate, scopeAllows, unauthorized } from "./bearer";
 import { connectUrl, getModuleStatuses, type ModuleStatusEntry, markModuleFailure, toActionable, toolContext } from "./connection";
 import { getDb } from "./db";
+import { gatewayConnectUrlTool, gatewayStatusTool } from "./gateway-tools";
 import { modules as allModules } from "./modules/registry";
 import { dataToText, sanitizeDeep, sanitizeString } from "./modules/sanitize";
 import type { ActionableError, Module, ModuleId, ToolDef, ToolResult } from "./modules/types";
@@ -171,11 +172,11 @@ export async function createGatewayServer(opts: {
   }
 
   server.registerTool(
-    "gateway_status",
+    gatewayStatusTool.name,
     {
-      title: "Estado del gateway",
-      description: "Estado real de cada modulo (probe), ultimo chequeo, error y accion pendiente.",
-      inputSchema: z.object({}),
+      title: gatewayStatusTool.title,
+      description: gatewayStatusTool.description,
+      inputSchema: gatewayStatusTool.inputSchema,
       outputSchema,
       annotations: ANNOTATIONS,
     },
@@ -190,14 +191,11 @@ export async function createGatewayServer(opts: {
   );
 
   server.registerTool(
-    "gateway_connect_url",
+    gatewayConnectUrlTool.name,
     {
-      title: "Enlace para conectar un modulo",
-      description:
-        "Devuelve el enlace para conectar o reconectar un modulo. Entregalo al usuario; nunca lo abras por tu cuenta.",
-      inputSchema: z.object({
-        module: z.string().min(1).max(32).describe(`Id del modulo: ${allModules.map((m) => m.id).join(", ")}`),
-      }),
+      title: gatewayConnectUrlTool.title,
+      description: gatewayConnectUrlTool.description,
+      inputSchema: gatewayConnectUrlTool.inputSchema,
       outputSchema,
       annotations: ANNOTATIONS,
     },
