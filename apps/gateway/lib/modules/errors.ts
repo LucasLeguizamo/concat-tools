@@ -1,6 +1,7 @@
 import { getEnv } from "../env";
 import { toSafeError, type SafeError } from "../safe-error";
 import type { ActionableError, ModuleId } from "./types";
+import { asArray, asRecord } from "./util";
 
 /** `${PUBLIC_URL}/google/start?module=<id>` (contrato B -> A). */
 export function connectUrl(moduleId: ModuleId): string {
@@ -27,6 +28,8 @@ export class NoResourcesError extends Error {
 export class GoogleApiError extends Error {
   /** Recurso consultado (p. ej. id de propiedad GA4); lo fija el handler para mensajes accionables. */
   resource?: string;
+  /** Codigos enum de Google Ads (`errorCode`, p. ej. USER_PERMISSION_DENIED). Solo cadenas MAYUSCULAS_CON_GUION_BAJO. */
+  reasons: string[] = [];
   constructor(
     readonly safe: SafeError,
     readonly retryAfter?: number,
@@ -58,7 +61,31 @@ export async function googleApiErrorFrom(res: Response): Promise<GoogleApiError>
   }
   const safe = toSafeError({ response: { status: res.status, data } });
   const retryAfter = res.headers.get("retry-after");
-  return new GoogleApiError(safe, retryAfter && /^\d{1,6}$/.test(retryAfter) ? Number(retryAfter) : undefined);
+  const err = new GoogleApiError(safe, retryAfter && /^\d{1,6}$/.test(retryAfter) ? Number(retryAfter) : undefined);
+  err.reasons = adsReasons(data);
+  return err;
+}
+
+/** `error.details[].errors[].errorCode.{categoria}: ENUM` de GoogleAdsFailure. Solo enums validados; nunca texto libre. */
+function adsReasons(data: unknown): string[] {
+  let body: unknown = data;
+  if (typeof data === "string") {
+    try {
+      body = JSON.parse(data);
+    } catch {
+      return [];
+    }
+  }
+  const out = new Set<string>();
+  const details = asArray(asRecord(asRecord(body).error).details);
+  for (const d of details) {
+    for (const e of asArray(asRecord(d).errors)) {
+      for (const v of Object.values(asRecord(asRecord(e).errorCode))) {
+        if (typeof v === "string" && /^[A-Z][A-Z0-9_]{2,63}$/.test(v)) out.add(v);
+      }
+    }
+  }
+  return [...out].slice(0, 10);
 }
 
 const GOOGLE_FETCH_TIMEOUT_MS = 20_000;
@@ -67,13 +94,14 @@ const GOOGLE_FETCH_TIMEOUT_MS = 20_000;
 export async function googleFetch(
   url: string,
   accessToken: string,
-  init: { method?: "GET" | "POST"; body?: unknown } = {},
+  init: { method?: "GET" | "POST"; body?: unknown; headers?: Record<string, string> } = {},
 ): Promise<unknown> {
   let res: Response;
   try {
     res = await fetch(url, {
       method: init.method ?? "GET",
       headers: {
+        ...init.headers,
         authorization: `Bearer ${accessToken}`,
         accept: "application/json",
         ...(init.body !== undefined ? { "content-type": "application/json" } : {}),

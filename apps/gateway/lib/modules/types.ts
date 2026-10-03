@@ -75,6 +75,11 @@ export interface ToolDef<S extends z.ZodType = z.ZodType> {
   title: string;
   description: string;
   inputSchema: S;
+  /**
+   * Solo modulos proxy: JSON Schema del tools/list remoto (ya filtrado y saneado). Si existe, mcp-server lo usa
+   * en vez de `inputSchema` (que queda como marcador laxo) y valida con el validador JSON Schema del SDK.
+   */
+  jsonInputSchema?: Record<string, unknown>;
   /** v1: todas con readOnlyHint: true. */
   annotations: ToolAnnotations;
   // Sintaxis de metodo (bivariante) para poder guardar ToolDef<Especifico> en ToolDef[].
@@ -91,4 +96,13 @@ export interface Module {
   probe(ctx: ToolContext): Promise<ProbeResult>;
   tools: ToolDef[];
   explainError(err: unknown): ActionableError;
+  /** "Modulo en beta cerrada": fases B/C de la spec §11 (Developer Preview / scopes sin verificar). */
+  beta?: boolean;
+  /**
+   * Solo proxy: las tools salen del `tools/list` remoto, que necesita el token del usuario. Si el remoto no
+   * responde devuelve [] (el modulo no registra tools; `remoteStatus()` lo explica en gateway_status).
+   */
+  listTools?(ctx: ToolContext): Promise<ToolDef[]>;
+  /** Solo proxy: ultimo resultado de listTools de ese usuario en esta instancia (para gateway_status). */
+  remoteStatus?(userId: string): { ok: boolean; tools: number; error?: string } | undefined;
 }

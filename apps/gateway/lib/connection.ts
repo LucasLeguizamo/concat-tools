@@ -138,6 +138,8 @@ export type ModuleStatusEntry = {
   resource_count: number | null;
   last_error: string | null;
   connect_url: string;
+  /** true = "modulo en beta cerrada" (fases B/C, spec §11). */
+  beta: boolean;
   /** Accion pendiente en una frase (null si no hay). */
   action: string | null;
 };
@@ -177,6 +179,7 @@ export async function getModuleStatuses(userId: string, allowed: (id: ModuleId) 
         resource_count: r?.resource_count ?? null,
         last_error: r?.last_error ?? null,
         connect_url: connectUrl(m.id),
+        beta: m.beta === true,
         action: pendingAction(m, status),
       };
     });

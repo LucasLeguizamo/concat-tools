@@ -1,7 +1,14 @@
-import { createMcpHandler, McpServer, type AuthInfo, type CallToolResult } from "@modelcontextprotocol/server";
+import {
+  createMcpHandler,
+  fromJsonSchema,
+  McpServer,
+  type AuthInfo,
+  type CallToolResult,
+  type JsonSchemaType,
+} from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { authenticate, scopeAllows, unauthorized } from "./bearer";
-import { connectUrl, getModuleStatuses, markModuleFailure, toActionable, toolContext } from "./connection";
+import { connectUrl, getModuleStatuses, type ModuleStatusEntry, markModuleFailure, toActionable, toolContext } from "./connection";
 import { getDb } from "./db";
 import { modules as allModules } from "./modules/registry";
 import { dataToText, sanitizeDeep, sanitizeString } from "./modules/sanitize";
@@ -23,6 +30,39 @@ export function visibleTools(
   return registry
     .filter((m) => connected.has(m.id) && scopeAllows(scope, m.id))
     .flatMap((module) => module.tools.map((tool) => ({ module, tool })));
+}
+
+/**
+ * Como visibleTools, pero los modulos proxy traen sus tools del tools/list remoto (allowlist + cache por instancia).
+ * Un remoto caido no rompe el tools/list: ese modulo simplemente no aporta tools (gateway_status lo explica).
+ */
+export async function resolveTools(
+  userId: string,
+  connected: ReadonlySet<string>,
+  scope: string[],
+  registry: Module[] = allModules,
+): Promise<VisibleTool[]> {
+  const mods = registry.filter((m) => connected.has(m.id) && scopeAllows(scope, m.id));
+  const lists = await Promise.all(
+    mods.map(async (mod) => ({
+      mod,
+      tools: mod.listTools ? await mod.listTools(toolContext(userId, mod)).catch(() => []) : mod.tools,
+    })),
+  );
+  return lists.flatMap(({ mod, tools }) => tools.map((tool) => ({ module: mod, tool })));
+}
+
+/** gateway_status: marca beta y, en modulos proxy conectados, si el servidor MCP remoto responde y cuantas tools expone. */
+async function withRemoteInfo(userId: string, entries: ModuleStatusEntry[]) {
+  return Promise.all(
+    entries.map(async (e) => {
+      const mod = allModules.find((m) => m.id === e.id);
+      if (!mod?.listTools || e.status !== "connected") return e;
+      await mod.listTools(toolContext(userId, mod)).catch(() => []); // refresca la cache si hace falta
+      const remote = mod.remoteStatus?.(userId);
+      return remote ? { ...e, remote_tools: remote } : e;
+    }),
+  );
 }
 
 export async function connectedModuleIds(userId: string): Promise<Set<string>> {
@@ -96,17 +136,22 @@ async function checkToolRate(userId: string, module: string): Promise<Actionable
 
 const ANNOTATIONS = { readOnlyHint: true, openWorldHint: true } as const;
 
-export function createGatewayServer(opts: { userId: string; scope: string[]; connected: ReadonlySet<string> }): McpServer {
+export async function createGatewayServer(opts: {
+  userId: string;
+  scope: string[];
+  connected: ReadonlySet<string>;
+}): Promise<McpServer> {
   const { userId, scope } = opts;
   const server = new McpServer({ name: "concat-google-gateway", version: "0.1.0" });
 
-  for (const { module, tool } of visibleTools(opts.connected, scope)) {
+  for (const { module, tool } of await resolveTools(userId, opts.connected, scope)) {
     server.registerTool(
       tool.name,
       {
         title: tool.title,
         description: tool.description,
-        inputSchema: tool.inputSchema as z.ZodObject,
+        // Tools proxy: el JSON Schema del remoto (validado por el SDK); nativas: zod.
+        inputSchema: tool.jsonInputSchema ? fromJsonSchema(tool.jsonInputSchema as JsonSchemaType) : (tool.inputSchema as z.ZodObject),
         outputSchema,
         annotations: { ...tool.annotations, ...ANNOTATIONS },
       },
@@ -138,7 +183,7 @@ export function createGatewayServer(opts: { userId: string; scope: string[]; con
       const limited = await checkToolRate(userId, "gateway");
       if (limited) return errorResult(limited);
       await audit(userId, "gateway", "gateway_status");
-      const entries = await getModuleStatuses(userId, (id) => scopeAllows(scope, id));
+      const entries = await withRemoteInfo(userId, await getModuleStatuses(userId, (id) => scopeAllows(scope, id)));
       // last_error puede citar texto de Google.
       return okResult({ data: { modules: entries } }, { untrusted: true });
     },

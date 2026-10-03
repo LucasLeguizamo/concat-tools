@@ -31,6 +31,12 @@ export default async function ConnectPage({
   return (
     <Shell title={`Conectar ${mod.id}`}>
       {error && <p role="alert">{ERRORS[error] ?? "No se pudo conectar el modulo."}</p>}
+      {mod.beta && (
+        <p role="note">
+          <strong>Modulo en beta cerrada.</strong> Funciona solo para las cuentas de la lista de prueba de Google
+          mientras se completa la verificacion de la app; el acceso puede caducar a los 7 dias.
+        </p>
+      )}
       <p>Vas a dar acceso de <strong>solo lectura</strong> a este modulo:</p>
       <ul>
         {mod.scopes.read.map((s) => (

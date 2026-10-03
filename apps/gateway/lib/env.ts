@@ -43,6 +43,12 @@ const schema = z.object({
   }),
   CRON_SECRET: z.string().min(16),
   JWT_SECRET: z.string().min(32),
+  // Opcional: Google Ads dio de baja el developer token el 2026-09-09 (se ignora si se envia). Solo para self-host
+  // contra versiones/cuentas que aun lo pidan.
+  GOOGLE_ADS_DEVELOPER_TOKEN: z
+    .string()
+    .optional()
+    .transform((v) => v?.trim() || undefined),
 });
 
 export type Env = z.infer<typeof schema>;
