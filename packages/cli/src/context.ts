@@ -1,6 +1,7 @@
 import type { Deps } from "./deps.js";
+import { usageError } from "./errors.js";
 import { formatOutput } from "./format.js";
-import { createSession, type Session } from "./session.js";
+import { API_TOKEN_RE, createSession, type Session } from "./session.js";
 
 export interface Ctx {
   deps: Deps;
@@ -11,11 +12,15 @@ export interface Ctx {
 }
 
 export function createCtx(deps: Deps, gateway: string, jsonFlag: boolean): Ctx {
+  const apiToken = deps.env.CONCAT_TOKEN?.trim() || undefined;
+  if (apiToken && !API_TOKEN_RE.test(apiToken)) {
+    throw usageError("CONCAT_TOKEN no tiene formato de token de API (cgw_…).");
+  }
   return {
     deps,
     gateway,
     json: jsonFlag || !deps.stdout.isTTY,
-    session: createSession(gateway, deps.store, deps.net),
+    session: createSession(gateway, deps.store, deps.net, apiToken),
   };
 }
 

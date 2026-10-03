@@ -24,6 +24,9 @@ Opciones globales:
   --json            Salida JSON aunque stdout sea una terminal
   -h, --help        Ayuda; en comandos generados: concat <grupo> <acción> --help
 
+Entorno:
+  CONCAT_TOKEN        Token de API (cgw_…, de "concat tokens create") para CI/n8n: sin login interactivo
+
 Exit codes: 0 ok, 1 otro, 2 uso, 3 no autenticado, 4 cuota, 5 módulo no conectado, 6 permiso de recurso`;
 
 const BUILTIN_HELP: Record<string, string> = {

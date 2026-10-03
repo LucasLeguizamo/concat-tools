@@ -11,7 +11,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "db:migrate": "node --env-file-if-exists=.env.local --import tsx scripts/migrate.ts"
+    "db:migrate": "node --env-file-if-exists=.env.local --import tsx scripts/migrate.ts",
+    "eval:tasks": "tsx evals/run-tasks.ts",
+    "docs:tools": "tsx scripts/gen-tools-docs.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/client": "2.3.0",
@@ -26,6 +28,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "0.131.0",
     "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

@@ -14,7 +14,10 @@ export interface Session {
   api(path: string, init?: { method?: "GET" | "POST" | "DELETE"; body?: unknown }): Promise<unknown>;
 }
 
-export function createSession(gateway: string, store: CredentialStore, net: Net): Session {
+/** Token de API del gateway (`cgw_…`, `concat tokens create`) para CI: se envía tal cual, sin login ni refresh. */
+export const API_TOKEN_RE = /^cgw_[A-Za-z0-9_-]{20,}$/;
+
+export function createSession(gateway: string, store: CredentialStore, net: Net, apiToken?: string): Session {
   let md: ServerMetadata | undefined;
   let current: Credentials | null | undefined;
 
@@ -22,6 +25,7 @@ export function createSession(gateway: string, store: CredentialStore, net: Net)
   const fresh = (c: Credentials) => c.expires_at - SKEW_MS > net.now();
 
   async function accessToken(force = false): Promise<string> {
+    if (apiToken) return apiToken;
     current ??= await store.load(gateway);
     if (!current) throw notAuthenticated();
     if (!force && fresh(current)) return current.access_token;
@@ -61,7 +65,15 @@ export function createSession(gateway: string, store: CredentialStore, net: Net)
     };
     let res = await call(await accessToken());
     if (res.status === 401) res = await call(await accessToken(true));
-    if (res.status === 401) throw notAuthenticated("El gateway rechazó tu sesión.");
+    if (res.status === 401) {
+      throw apiToken
+        ? new CliError("El gateway rechazó CONCAT_TOKEN (inválido, expirado o revocado).", EXIT.UNAUTHENTICATED, {
+            error: "unauthenticated",
+            fix: "Crea otro token con: concat tokens create (desde una sesión interactiva)",
+            next_action: "relogin",
+          })
+        : notAuthenticated("El gateway rechazó tu sesión.");
+    }
     const body: unknown = await res.json().catch(() => undefined);
     if (!res.ok) {
       const a = asActionable(body);
