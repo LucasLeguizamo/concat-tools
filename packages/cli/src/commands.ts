@@ -50,6 +50,7 @@ export async function logout(ctx: Ctx, args: string[]): Promise<number> {
 interface ModuleRow {
   id: string;
   status: string;
+  beta?: boolean;
   last_probe_at?: string | null;
   resource_count?: number | null;
   last_error?: string | null;
@@ -71,7 +72,7 @@ export async function status(ctx: Ctx, args: string[]): Promise<number> {
     ctx.deps.stdout.write(
       `${renderTable(
         modules.map((m) => ({
-          module: m.id,
+          module: m.beta ? `${m.id} (beta)` : m.id,
           status: m.status,
           resources: m.resource_count ?? "",
           "last probe": m.last_probe_at ?? "",
@@ -107,6 +108,7 @@ export async function connect(ctx: Ctx, args: string[]): Promise<number> {
       results.push({ module: id, status: "connected", resources: before.resource_count ?? null });
       continue;
     }
+    if (before.beta) log(ctx, `${id}: módulo en beta cerrada (solo cuentas de la lista de prueba de Google).`);
     const url = `${ctx.gateway}/google/start?module=${encodeURIComponent(id)}`;
     log(ctx, `${id}: autoriza en el navegador. Si no se abre, visita:`);
     log(ctx, `  ${url}`);
@@ -140,6 +142,83 @@ export async function connect(ctx: Ctx, args: string[]): Promise<number> {
   if (ctx.json) emit(ctx, { modules: results });
   else ctx.deps.stdout.write(`${renderTable(results)}\n`);
   return code;
+}
+
+/** Desconecta módulos: el gateway revoca en Google solo si ningún otro módulo usa el permiso. */
+export async function disconnect(ctx: Ctx, args: string[]): Promise<number> {
+  const { positionals } = parse(args, {}, true);
+  if (positionals.length === 0) throw usageError("Uso: concat disconnect <módulo...>");
+  for (const m of positionals) if (!MODULE_ID.test(m)) throw usageError(`Módulo inválido: ${m}`);
+  const results: Array<{ module: string; disconnected: boolean; revoked_at_google: boolean }> = [];
+  for (const id of positionals) {
+    const body = (await ctx.session.api(`/api/modules/${encodeURIComponent(id)}`, { method: "DELETE" })) as {
+      revoked_at_google?: boolean;
+    };
+    results.push({ module: id, disconnected: true, revoked_at_google: body?.revoked_at_google === true });
+  }
+  if (ctx.json) emit(ctx, { modules: results });
+  else {
+    for (const r of results) {
+      log(ctx, `${r.module}: desconectado${r.revoked_at_google ? " (acceso revocado en Google)" : ""}.`);
+    }
+  }
+  return EXIT.OK;
+}
+
+interface TokenRow {
+  id: string;
+  name: string | null;
+  scope: string[];
+  created_at?: string;
+  expires_at?: string;
+  token?: string;
+}
+
+const EXPIRES = /^(\d{1,3})d?$/;
+
+/** `concat tokens create|list|revoke`: tokens del gateway para n8n/CI (el secreto se muestra una sola vez). */
+export async function tokens(ctx: Ctx, args: string[]): Promise<number> {
+  const [sub, ...rest] = args;
+  if (sub === "create") {
+    const { values } = parse(rest, { name: { type: "string" }, scope: { type: "string" }, expires: { type: "string" } });
+    if (!values.name) throw usageError("Uso: concat tokens create --name <nombre> [--scope gsc,ga4] [--expires 90d]");
+    const m = EXPIRES.exec(values.expires ?? "90d");
+    if (!m || Number(m[1]) < 1 || Number(m[1]) > 365) throw usageError("--expires debe ser de 1d a 365d (p. ej. 90d).");
+    const scope = (values.scope ?? "*").split(",").map((s) => s.trim()).filter(Boolean);
+    for (const s of scope) if (s !== "*" && !MODULE_ID.test(s)) throw usageError(`Módulo inválido en --scope: ${s}`);
+    const created = (await ctx.session.api("/api/tokens", {
+      method: "POST",
+      body: { name: values.name, scope, expires_in_days: Number(m[1]) },
+    })) as TokenRow;
+    if (ctx.json) emit(ctx, created);
+    else {
+      // Secreto solo a stdout (puede capturarse con $(...)); el aviso va a stderr.
+      ctx.deps.stdout.write(`${created.token ?? ""}\n`);
+      log(ctx, `Token "${created.name ?? values.name}" (id ${created.id}) creado. Guárdalo ahora: no se vuelve a mostrar.`);
+    }
+    return EXIT.OK;
+  }
+  if (sub === "list") {
+    parse(rest, {});
+    const body = (await ctx.session.api("/api/tokens")) as { tokens?: TokenRow[] };
+    const list = body?.tokens ?? [];
+    if (ctx.json) emit(ctx, { tokens: list });
+    else {
+      ctx.deps.stdout.write(
+        `${renderTable(list.map((t) => ({ id: t.id, name: t.name ?? "", scope: t.scope.join(","), expires: t.expires_at ?? "" })))}\n`,
+      );
+    }
+    return EXIT.OK;
+  }
+  if (sub === "revoke") {
+    const { positionals } = parse(rest, {}, true);
+    if (positionals.length !== 1) throw usageError("Uso: concat tokens revoke <id>");
+    const id = positionals[0]!;
+    await ctx.session.api(`/api/tokens?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+    done(ctx, `Token ${id} revocado.`, { revoked: true, id });
+    return EXIT.OK;
+  }
+  throw usageError("Uso: concat tokens create|list|revoke ...");
 }
 
 export async function tools(ctx: Ctx, args: string[]): Promise<number> {

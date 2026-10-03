@@ -1,3 +1,4 @@
+import { isApiToken, verifyApiToken } from "./auth/api-tokens";
 import { verifyAccessToken, type GatewayClaims } from "./auth/gateway-token";
 import { getEnv } from "./env";
 
@@ -7,12 +8,12 @@ export function bearerFrom(request: Request): string | null {
   return m?.[1] ?? null;
 }
 
-/** Verifica el token del gateway (firma, exp, iss, aud). null si falta o es invalido. */
+/** Verifica el token del gateway: JWT (firma, exp, iss, aud) o token de API `cgw_` (DB). null si falta o es invalido. */
 export async function authenticate(request: Request): Promise<GatewayClaims | null> {
   const token = bearerFrom(request);
   if (!token) return null;
   try {
-    return await verifyAccessToken(token);
+    return isApiToken(token) ? await verifyApiToken(token) : await verifyAccessToken(token);
   } catch {
     return null;
   }

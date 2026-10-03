@@ -1,5 +1,6 @@
 import { createHash, randomInt, randomUUID, timingSafeEqual } from "node:crypto";
 import { getEnv } from "../env";
+import { API_TOKEN_CLIENT_ID } from "./api-tokens";
 import { CLI_CLIENT_ID } from "./clients";
 import { ACCESS_TOKEN_TTL_SECONDS, hashToken, randomToken, signAccessToken } from "./gateway-token";
 import { OAuthError } from "./http";
@@ -207,7 +208,8 @@ export function createOAuthServer(store: OAuthStore, clock: () => number = Date.
       const invalid = () => new OAuthError("invalid_grant", "refresh_token invalido, expirado o revocado");
       const hash = hashToken(p.refreshToken);
       let rec = await store.findRefresh(hash);
-      if (!rec || rec.clientId !== p.clientId) throw invalid();
+      // Los tokens de API (n8n/CI) no se rotan ni se canjean por access tokens: solo valen como Bearer.
+      if (!rec || rec.clientId !== p.clientId || rec.clientId === API_TOKEN_CLIENT_ID) throw invalid();
       // La vida absoluta de la familia manda aunque el token en si siga vigente.
       if (rec.familyExpiresAt.getTime() <= clock()) throw invalid();
 

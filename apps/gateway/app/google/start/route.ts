@@ -3,6 +3,7 @@ import { buildAuthUrl, LOGIN_SCOPES, newPkce, signState, signTx } from "../../..
 import { randomToken } from "../../../lib/auth/gateway-token";
 import { htmlError, publicUrl, safeNext } from "../../../lib/auth/http";
 import { cookieOptions, getSessionUser, TX_COOKIE_PATH, txCookieName } from "../../../lib/auth/session";
+import { hasGrant } from "../../../lib/auth/grants";
 import { getModule } from "../../../lib/modules/registry";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +20,9 @@ export async function GET(req: NextRequest) {
   let scopes = LOGIN_SCOPES;
   let uid: string | undefined;
   let loginHint: string | undefined;
+  // Tras desconectar el ultimo modulo el grant se borra (y se revoca en Google): Google solo devuelve un
+  // refresh token nuevo con prompt=consent.
+  let forceConsent = retry;
 
   if (moduleId) {
     const user = await getSessionUser();
@@ -33,6 +37,7 @@ export async function GET(req: NextRequest) {
     scopes = ["openid", "email", ...mod.scopes.read];
     uid = user.id;
     loginHint = user.email;
+    if (!(await hasGrant(user.id))) forceConsent = true;
   }
 
   const { verifier, challenge } = newPkce();
@@ -46,7 +51,7 @@ export async function GET(req: NextRequest) {
   });
 
   const res = NextResponse.redirect(
-    buildAuthUrl({ state, nonce, codeChallenge: challenge, scopes, loginHint, forceConsent: retry }),
+    buildAuthUrl({ state, nonce, codeChallenge: challenge, scopes, loginHint, forceConsent }),
     303,
   );
   res.cookies.set(txCookieName(), await signTx({ nonce, verifier }), cookieOptions(600, TX_COOKIE_PATH));

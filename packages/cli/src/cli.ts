@@ -1,4 +1,4 @@
-import { connect, login, logout, status, tools } from "./commands.js";
+import { connect, disconnect, login, logout, status, tokens, tools } from "./commands.js";
 import { createCtx, type Ctx } from "./context.js";
 import { resolveGateway } from "./config.js";
 import type { Deps } from "./deps.js";
@@ -13,6 +13,8 @@ Uso:
   concat logout                  Revoca y borra las credenciales locales
   concat status                  Estado real de cada módulo
   concat connect <módulo...>     Autoriza módulos (gsc, ga4, ...) y espera la conexión
+  concat disconnect <módulo...>  Desconecta módulos (revoca en Google si ningún otro lo usa)
+  concat tokens create|list|revoke  Tokens del gateway para n8n/CI (--name, --scope gsc,ga4, --expires 90d)
   concat tools                   Catálogo vivo de herramientas
   concat <grupo> <acción> ...    Ejecuta una herramienta (gsc performance --site ...)
   concat call <tool> '<json>'    Escape genérico: llama a una herramienta por nombre
@@ -29,6 +31,9 @@ const BUILTIN_HELP: Record<string, string> = {
   logout: "Uso: concat logout",
   status: "Uso: concat status [--json]",
   connect: "Uso: concat connect <módulo...> [--timeout <segundos>]",
+  disconnect: "Uso: concat disconnect <módulo...>",
+  tokens:
+    "Uso: concat tokens create --name <nombre> [--scope gsc,ga4] [--expires 90d]\n     concat tokens list\n     concat tokens revoke <id>\n  El secreto se muestra una sola vez.",
   tools: "Uso: concat tools [--json]",
   call: "Uso: concat call <tool> '<json>'",
 };
@@ -57,7 +62,7 @@ export function extractGlobals(argv: string[]): Globals {
 
 async function dispatch(ctx: Ctx, command: string, rest: string[]): Promise<number> {
   const wantsHelp = rest.includes("--help") || rest.includes("-h");
-  const builtinHelp = BUILTIN_HELP[command];
+  const builtinHelp = BUILTIN_HELP[command === "token" ? "tokens" : command];
   if (builtinHelp !== undefined && wantsHelp) {
     ctx.deps.stdout.write(`${builtinHelp}\n`);
     return EXIT.OK;
@@ -71,6 +76,11 @@ async function dispatch(ctx: Ctx, command: string, rest: string[]): Promise<numb
       return status(ctx, rest);
     case "connect":
       return connect(ctx, rest);
+    case "disconnect":
+      return disconnect(ctx, rest);
+    case "tokens":
+    case "token":
+      return tokens(ctx, rest);
     case "tools":
       return tools(ctx, rest);
     case "call": {

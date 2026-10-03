@@ -128,3 +128,7 @@ CREATE TABLE IF NOT EXISTS rate_limits (
   count         integer     NOT NULL DEFAULT 0,
   PRIMARY KEY (key, window_start)
 );
+
+-- M2: tokens del gateway para n8n/CI (client_id = 'api-token'). `id` es el identificador publico (listar/revocar sin exponer hashes).
+ALTER TABLE gateway_tokens ADD COLUMN IF NOT EXISTS id uuid NOT NULL DEFAULT gen_random_uuid();
+CREATE UNIQUE INDEX IF NOT EXISTS gateway_tokens_id_idx ON gateway_tokens (id);

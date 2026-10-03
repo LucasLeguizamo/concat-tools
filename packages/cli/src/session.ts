@@ -10,8 +10,8 @@ export interface Session {
   metadata(): Promise<ServerMetadata>;
   /** Access token vigente; refresca (y persiste la rotación) si hace falta. */
   accessToken(force?: boolean): Promise<string>;
-  /** GET autenticado a la API del gateway; devuelve JSON. */
-  api(path: string): Promise<unknown>;
+  /** Llamada autenticada a la API de gestión del gateway (/api/*); devuelve JSON. Por defecto GET. */
+  api(path: string, init?: { method?: "GET" | "POST" | "DELETE"; body?: unknown }): Promise<unknown>;
 }
 
 export function createSession(gateway: string, store: CredentialStore, net: Net): Session {
@@ -42,11 +42,17 @@ export function createSession(gateway: string, store: CredentialStore, net: Net)
     }
   }
 
-  async function api(path: string): Promise<unknown> {
+  async function api(path: string, init: { method?: "GET" | "POST" | "DELETE"; body?: unknown } = {}): Promise<unknown> {
     const call = async (token: string) => {
       try {
         return await net.fetch(`${gateway}${path}`, {
-          headers: { authorization: `Bearer ${token}`, accept: "application/json" },
+          method: init.method ?? "GET",
+          headers: {
+            authorization: `Bearer ${token}`,
+            accept: "application/json",
+            ...(init.body !== undefined ? { "content-type": "application/json" } : {}),
+          },
+          ...(init.body !== undefined ? { body: JSON.stringify(init.body) } : {}),
           signal: AbortSignal.timeout(30_000),
         });
       } catch {

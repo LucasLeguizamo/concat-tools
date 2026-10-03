@@ -9,6 +9,26 @@ describe("mapeo tool <-> comando", () => {
     expect(toolToCommand("gateway_connect_url")).toEqual({ group: "gateway", action: "connect-url" });
   });
 
+  it("tools de ads y de los proxies de Workspace", () => {
+    const cases: Array<[string, string, string]> = [
+      ["ads_list_customers", "ads", "list-customers"],
+      ["ads_search", "ads", "search"],
+      ["gmail_search_threads", "gmail", "search-threads"],
+      ["gmail_get_thread", "gmail", "get-thread"],
+      ["drive_read_file_content", "drive", "read-file-content"],
+      ["docs_read_doc", "docs", "read-doc"],
+      ["sheets_get_values", "sheets", "get-values"],
+      ["slides_read_presentation", "slides", "read-presentation"],
+      ["calendar_list_events", "calendar", "list-events"],
+      ["chat_search_messages", "chat", "search-messages"],
+      ["people_get_user_profile", "people", "get-user-profile"],
+    ];
+    for (const [tool, group, action] of cases) {
+      expect(toolToCommand(tool)).toEqual({ group, action });
+      expect(commandToTool(group, action)).toBe(tool);
+    }
+  });
+
   it("nombres sin grupo/acción no mapean", () => {
     expect(toolToCommand("ping")).toBeNull();
     expect(toolToCommand("_x")).toBeNull();

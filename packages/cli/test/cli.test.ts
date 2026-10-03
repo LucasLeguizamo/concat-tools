@@ -195,6 +195,114 @@ describe("connect", () => {
   });
 });
 
+describe("status: módulos en beta cerrada", () => {
+  it("marca (beta) en la tabla y conserva `beta` en el JSON", async () => {
+    const modules = [
+      { id: "gsc", status: "connected", beta: false, resource_count: 1 },
+      { id: "gmail", status: "not_connected", beta: true },
+    ];
+    const t = harness({ routes: [statusRoute(modules)], tty: true });
+    await run(["status"], t.deps);
+    expect(t.out.join("")).toMatch(/gmail \(beta\)\s+not_connected/);
+    expect(t.out.join("")).not.toContain("gsc (beta)");
+    const j = harness({ routes: [statusRoute(modules)] });
+    await run(["status"], j.deps);
+    expect(JSON.parse(j.out.join("")).modules[1].beta).toBe(true);
+  });
+
+  it("connect avisa de la beta cerrada por stderr", async () => {
+    let polls = 0;
+    const h = harness({
+      routes: [
+        (u) => {
+          if (u.pathname !== "/api/status") return undefined;
+          polls++;
+          return json({ modules: [{ id: "gmail", beta: true, status: polls < 2 ? "not_connected" : "connected", last_probe_at: null, resource_count: polls < 2 ? null : 1 }] });
+        },
+      ],
+    });
+    expect(await run(["connect", "gmail"], h.deps)).toBe(0);
+    expect(h.err.join("")).toContain("beta cerrada");
+  });
+});
+
+describe("disconnect", () => {
+  const apiCalls = (h: ReturnType<typeof harness>) =>
+    (h.deps.net.fetch as unknown as { calls: Array<{ url: string; init: RequestInit }> }).calls.filter((c) => c.url.includes("/api/"));
+
+  it("DELETE /api/modules/<id> por módulo con Bearer", async () => {
+    const h = harness({
+      routes: [(u, init) => (u.pathname.startsWith("/api/modules/") && init.method === "DELETE" ? json({ module: u.pathname.split("/").pop(), revoked_at_google: u.pathname.endsWith("gsc") }) : undefined)],
+      tty: true,
+    });
+    expect(await run(["disconnect", "gsc", "ga4"], h.deps)).toBe(0);
+    const calls = apiCalls(h);
+    expect(calls.map((c) => [c.init.method, new URL(c.url).pathname])).toEqual([["DELETE", "/api/modules/gsc"], ["DELETE", "/api/modules/ga4"]]);
+    expect((calls[0]!.init.headers as Record<string, string>).authorization).toBe("Bearer at-1");
+    expect(h.err.join("")).toContain("gsc: desconectado (acceso revocado en Google)");
+    expect(h.err.join("")).toContain("ga4: desconectado.");
+  });
+
+  it("JSON de salida; sin módulos o módulo inválido => exit 2; 403 => exit 1; sesión ausente => exit 3", async () => {
+    const ok = harness({ routes: [(u) => (u.pathname === "/api/modules/gsc" ? json({ module: "gsc", revoked_at_google: false }) : undefined)] });
+    expect(await run(["disconnect", "gsc"], ok.deps)).toBe(0);
+    expect(JSON.parse(ok.out.join(""))).toEqual({ modules: [{ module: "gsc", disconnected: true, revoked_at_google: false }] });
+    expect(await run(["disconnect"], ok.deps)).toBe(2);
+    expect(await run(["disconnect", "../x"], ok.deps)).toBe(2);
+    const forbidden = harness({ routes: [(u) => (u.pathname.startsWith("/api/modules/") ? json({ error: "forbidden", message: "sin alcance", fix: "usa otro token" }, 403) : undefined)] });
+    expect(await run(["disconnect", "gsc"], forbidden.deps)).toBe(1);
+    expect(await run(["disconnect", "gsc"], harness({ creds: null }).deps)).toBe(3);
+  });
+});
+
+describe("tokens", () => {
+  const tokenRoutes = (seen: Array<{ method?: string; path: string; body?: unknown }>): Route[] => [
+    (u, init) => {
+      if (!u.pathname.startsWith("/api/tokens")) return undefined;
+      seen.push({ method: init.method, path: u.pathname + u.search, body: init.body ? JSON.parse(String(init.body)) : undefined });
+      if (init.method === "POST") return json({ id: "id-1", name: "n8n", scope: ["gsc", "ga4"], expires_at: "2027-01-01T00:00:00Z", token: "cgw_SECRETO" }, 201);
+      if (init.method === "DELETE") return json({ revoked: true, id: "id-1" });
+      return json({ tokens: [{ id: "id-1", name: "n8n", scope: ["gsc", "ga4"], expires_at: "2027-01-01T00:00:00Z" }] });
+    },
+  ];
+
+  it("create: manda name/scope/días, imprime el secreto SOLO en stdout y avisa por stderr", async () => {
+    const seen: Array<{ method?: string; path: string; body?: unknown }> = [];
+    const h = harness({ routes: tokenRoutes(seen), tty: true });
+    expect(await run(["tokens", "create", "--name", "n8n", "--scope", "gsc,ga4", "--expires", "30d"], h.deps)).toBe(0);
+    expect(seen).toEqual([{ method: "POST", path: "/api/tokens", body: { name: "n8n", scope: ["gsc", "ga4"], expires_in_days: 30 } }]);
+    expect(h.out.join("")).toBe("cgw_SECRETO\n");
+    expect(h.err.join("")).toContain("no se vuelve a mostrar");
+    expect(h.err.join("")).not.toContain("cgw_SECRETO");
+  });
+
+  it("create: defaults (* y 90d), JSON y alias `token`", async () => {
+    const seen: Array<{ method?: string; path: string; body?: unknown }> = [];
+    const h = harness({ routes: tokenRoutes(seen) });
+    expect(await run(["token", "create", "--name", "ci"], h.deps)).toBe(0);
+    expect(seen[0]!.body).toEqual({ name: "ci", scope: ["*"], expires_in_days: 90 });
+    expect(JSON.parse(h.out.join("")).token).toBe("cgw_SECRETO");
+  });
+
+  it("create: validación de uso => exit 2", async () => {
+    const h = harness({ routes: tokenRoutes([]) });
+    for (const args of [["create"], ["create", "--name", "x", "--expires", "0d"], ["create", "--name", "x", "--expires", "999d"], ["create", "--name", "x", "--expires", "abc"], ["create", "--name", "x", "--scope", "../x"], ["nope"], []]) {
+      expect(await run(["tokens", ...args], h.deps), args.join(" ")).toBe(2);
+    }
+  });
+
+  it("list nunca muestra secretos; revoke manda DELETE con el id", async () => {
+    const seen: Array<{ method?: string; path: string; body?: unknown }> = [];
+    const t = harness({ routes: tokenRoutes(seen), tty: true });
+    expect(await run(["tokens", "list"], t.deps)).toBe(0);
+    expect(t.out.join("")).toMatch(/id-1\s+n8n\s+gsc,ga4/);
+    expect(t.out.join("")).not.toContain("cgw_");
+    expect(await run(["tokens", "revoke", "id-1"], t.deps)).toBe(0);
+    expect(seen.at(-1)).toMatchObject({ method: "DELETE", path: "/api/tokens?id=id-1" });
+    expect(await run(["tokens", "revoke"], t.deps)).toBe(2);
+  });
+});
+
 describe("login / logout / config", () => {
   it("login --device guarda las credenciales", async () => {
     const h = harness({

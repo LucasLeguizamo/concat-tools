@@ -364,6 +364,19 @@ describe("refresh con rotacion", () => {
     );
   });
 
+  it("un token de API (client_id api-token) nunca se canjea por el flujo refresh", async () => {
+    const { hashToken } = await import("./gateway-token");
+    await mem.store.insertRefresh(hashToken("cgw_secreto"), {
+      userId: "u1",
+      clientId: "api-token",
+      scope: "*",
+      expiresAt: new Date(now + 1e9),
+      familyId: randomUUID(),
+      familyExpiresAt: new Date(now + 1e9),
+    });
+    expect(await errCode(server.exchangeRefresh({ refreshToken: "cgw_secreto", clientId: "api-token" }))).toBe("invalid_grant");
+  });
+
   it("scope solo puede estrecharse", async () => {
     const t = await login(["gsc", "ga4"]);
     expect(await errCode(server.exchangeRefresh({ refreshToken: t.refresh_token, clientId: "concat-cli", scope: "drive" }))).toBe(
