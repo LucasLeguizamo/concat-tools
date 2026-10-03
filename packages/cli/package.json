@@ -1,0 +1,34 @@
+{
+  "name": "@concat/cli",
+  "version": "0.1.0",
+  "description": "CLI de CONCAT Google Gateway: cliente MCP delgado, comandos generados desde tools/list.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "concat": "./dist/bin.js"
+  },
+  "files": [
+    "dist",
+    "SKILL.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/client": "2.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@types/node": "26.6.4",
+    "eslint": "9.39.5",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.0",
+    "vitest": "5.0.3"
+  }
+}

@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: npm # cubre pnpm (pnpm-lock.yaml)
+    directories:
+      - "/"
+      - "/packages/*"
+      - "/apps/*"
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7 # no adoptar versiones recién publicadas (ventana ante paquetes comprometidos)
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
