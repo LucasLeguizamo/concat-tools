@@ -28,7 +28,7 @@ describe("gsc: definicion", () => {
   it("scope de solo lectura y todas las tools readOnly/openWorld", () => {
     expect(gscModule.scopes.read).toEqual(["https://www.googleapis.com/auth/webmasters.readonly"]);
     expect(gscModule.scopes.write).toEqual([]);
-    expect(gscModule.tools.map((t) => t.name)).toEqual(["gsc_list_sites", "gsc_performance", "gsc_list_sitemaps"]);
+    expect(gscModule.tools.map((t) => t.name).slice(0, 3)).toEqual(["gsc_list_sites", "gsc_performance", "gsc_list_sitemaps"]);
     for (const t of gscModule.tools) expect(t.annotations).toMatchObject({ readOnlyHint: true, openWorldHint: true });
   });
 });

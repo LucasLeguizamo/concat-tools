@@ -17,7 +17,11 @@ function requireModule(id: ModuleId): Module {
 }
 
 export function toolContext(userId: string, mod: Module): ToolContext {
-  return { userId, getAccessToken: () => getAccessToken(userId, mod.scopes.read) };
+  return {
+    userId,
+    getAccessToken: () => getAccessToken(userId, mod.scopes.read),
+    getAccessTokenFor: (id) => getAccessToken(userId, requireModule(id).scopes.read),
+  };
 }
 
 async function emailOf(userId: string): Promise<string | undefined> {

@@ -7,6 +7,7 @@ import {
   NoResourcesError,
   scopeLostActionable,
 } from "./errors";
+import { seoTools } from "./seo";
 import type { ActionableError, Module, ProbeResult, ToolContext, ToolDef, ToolResult } from "./types";
 import { asArray, asNumber, asRecord, asString, dayRange, round } from "./util";
 
@@ -159,6 +160,6 @@ export const gscModule: Module = {
   scopes: { read: [GSC_SCOPE], write: [] },
   extraPermission: "Tu correo debe ser usuario de la propiedad en Search Console. `sc-domain:` y `https://` son propiedades distintas.",
   probe,
-  tools: [listSitesTool, performanceTool, listSitemapsTool] as ToolDef[],
+  tools: [listSitesTool, performanceTool, listSitemapsTool, ...seoTools] as ToolDef[],
   explainError,
 };
