@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { signAccessToken } from "./auth/gateway-token";
 import { ActionableException } from "./modules/errors";
+import { seoTools } from "./modules/seo";
 import { setTestEnv } from "./modules/test-utils";
 
 // --- mocks de infraestructura (DB y token de Google) ---
@@ -54,7 +55,16 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("visibleTools: filtro por modulo conectado y scope del token", () => {
-  const names = (connected: string[], scope: string[]) => visibleTools(new Set(connected), scope).map((v) => v.tool.name);
+  // Los workflows SEO (modules/seo.ts) viven en el modulo gsc; sus nombres se cubren en seo.test.ts.
+  const seoNames = new Set(seoTools.map((t) => t.name));
+  const names = (connected: string[], scope: string[]) =>
+    visibleTools(new Set(connected), scope).map((v) => v.tool.name).filter((n) => !seoNames.has(n));
+
+  it("las tools SEO se exponen solo con gsc conectado y scope gsc", () => {
+    const all = (c: string[], s: string[]) => visibleTools(new Set(c), s).map((v) => v.tool.name);
+    for (const t of seoNames) expect(all(["gsc"], ["gsc"])).toContain(t);
+    for (const t of seoNames) expect(all(["ga4"], ["*"])).not.toContain(t);
+  });
 
   it("solo modulos conectados, en orden determinista (registry)", () => {
     expect(names(["gsc", "ga4"], ["*"])).toEqual(["gsc_list_sites", "gsc_performance", "gsc_list_sitemaps", "ga4_list_properties", "ga4_daily_report"]);
@@ -109,7 +119,7 @@ describe("POST /mcp", () => {
     const { res, json } = await rpc(token, "tools/list");
     expect(res.status).toBe(200);
     const tools = json.result.tools as Array<{ name: string; annotations?: { readOnlyHint?: boolean; openWorldHint?: boolean }; outputSchema?: unknown }>;
-    expect(tools.map((t) => t.name)).toEqual(["gsc_list_sites", "gsc_performance", "gsc_list_sitemaps", "gateway_status", "gateway_connect_url"]);
+    expect(tools.map((t) => t.name).filter((n) => !seoTools.some((s) => s.name === n))).toEqual(["gsc_list_sites", "gsc_performance", "gsc_list_sitemaps", "gateway_status", "gateway_connect_url"]);
     for (const t of tools) {
       expect(t.annotations?.readOnlyHint).toBe(true);
       expect(t.annotations?.openWorldHint).toBe(true);

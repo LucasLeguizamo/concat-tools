@@ -30,6 +30,8 @@ export interface ToolContext {
   userId: string;
   /** Access token de Google del usuario dueño del token del gateway. Solo en memoria; nunca loguear. */
   getAccessToken(): Promise<string>;
+  /** Access token para OTRO modulo (tools que cruzan modulos, p. ej. gsc + ga4). Lanza ActionableException si falta el scope. */
+  getAccessTokenFor?(moduleId: ModuleId): Promise<string>;
 }
 
 export interface ProbeResult {
