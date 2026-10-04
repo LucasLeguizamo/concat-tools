@@ -24,7 +24,7 @@ concat tokens revoke <id>
 ```bash
 export CONCAT_TOKEN=cgw_...          # store it as a CI secret, never in the repo
 export CONCAT_GATEWAY_URL=https://gw.onconcat.com   # optional
-npx -y @concat/cli gsc performance --site sc-domain:onconcat.com --json
+npx -y @lucasleguizamo/concat gsc performance --site sc-domain:onconcat.com --json
 ```
 
 With `CONCAT_TOKEN` the CLI does not use the keychain or refresh: it sends the token as is. A malformed token exits with code 2; if the gateway rejects it (expired or revoked), with code 3. See [errors](errors.md).

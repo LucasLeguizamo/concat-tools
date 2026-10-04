@@ -9,12 +9,12 @@ Un módulo es un servicio de Google (Search Console, GA4, Ads, Calendar...). El 
 ### Con la CLI
 
 ```bash
-npx -y @concat/cli login            # navegador, una vez. Sin navegador: login --device
-npx -y @concat/cli connect gsc ga4  # abre el consentimiento de Google solo para esos módulos
-npx -y @concat/cli status           # estado real de cada módulo
+npx -y @lucasleguizamo/concat login            # navegador, una vez. Sin navegador: login --device
+npx -y @lucasleguizamo/concat connect gsc ga4  # abre el consentimiento de Google solo para esos módulos
+npx -y @lucasleguizamo/concat status           # estado real de cada módulo
 ```
 
-Instalada (`npm i -g @concat/cli`) el comando es `concat`:
+Instalada (`npm i -g @lucasleguizamo/concat`) el comando es `concat`:
 
 ```bash
 concat tools                                                        # catálogo vivo

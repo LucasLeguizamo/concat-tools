@@ -10,7 +10,7 @@
 
 ```bash
 claude mcp add --transport http concat https://gw.onconcat.com/mcp
-npx -y @concat/cli login && npx -y @concat/cli connect gsc ga4
+npx -y @lucasleguizamo/concat login && npx -y @lucasleguizamo/concat connect gsc ga4
 ```
 
 | | Español | English |
@@ -27,7 +27,7 @@ npx -y @concat/cli login && npx -y @concat/cli connect gsc ga4
 
 - `apps/gateway`: el gateway (Next.js, MCP + OAuth) / the gateway. Evals in `apps/gateway/evals`.
 - `apps/web`: landing ES/EN (Next.js, SSG, terminal + pixels). `pnpm --filter web dev`; optional env in `apps/web/README.md`.
-- `packages/cli`: `@concat/cli`.
+- `packages/cli`: `@lucasleguizamo/concat`.
 - `server.json`: entrada del [MCP Registry](https://github.com/modelcontextprotocol/registry) / MCP Registry entry.
 
 ```bash

@@ -33,7 +33,7 @@ export default async function Image({ params }: { params: Promise<{ lang: string
           <div style={{ display: "flex" }}>{dict.hero.titleMain}</div>
           <div style={{ display: "flex", color: "#7ee26b" }}>{dict.hero.titleAccent}</div>
         </div>
-        <div style={{ display: "flex", fontSize: 32, color: "#93a38b" }}>$ npx @concat/cli login</div>
+        <div style={{ display: "flex", fontSize: 32, color: "#93a38b" }}>$ npx @lucasleguizamo/concat login</div>
       </div>
     ),
     size,

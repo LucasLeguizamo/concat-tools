@@ -1,8 +1,19 @@
 {
-  "name": "@concat/cli",
+  "name": "@lucasleguizamo/concat",
   "version": "0.1.0",
   "description": "CLI de CONCAT Google Gateway: cliente MCP delgado, comandos generados desde tools/list.",
   "license": "MIT",
+  "author": "Lucas Leguizamo <lucasleguizamo21@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LucasLeguizamo/concat-tools.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/LucasLeguizamo/concat-tools#readme",
+  "bugs": "https://github.com/LucasLeguizamo/concat-tools/issues",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "bin": {
     "concat": "./dist/bin.js"

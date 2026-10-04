@@ -106,7 +106,7 @@ pnpm --filter gateway db:migrate     # idempotente: puedes correrlo N veces (lee
 pnpm --filter gateway dev            # http://localhost:3000
 ```
 
-Abre `http://localhost:3000/login`, entra con una cuenta de prueba y conecta un módulo desde el dashboard. Con la CLI: `CONCAT_GATEWAY_URL=http://localhost:3000 npx -y @concat/cli login`.
+Abre `http://localhost:3000/login`, entra con una cuenta de prueba y conecta un módulo desde el dashboard. Con la CLI: `CONCAT_GATEWAY_URL=http://localhost:3000 npx -y @lucasleguizamo/concat login`.
 
 ## 6. Deploy en Vercel
 

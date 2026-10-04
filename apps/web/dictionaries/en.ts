@@ -41,13 +41,13 @@ export const en: Dictionary = {
       "AES-256-GCM",
       "OAuth 2.1 + PKCE",
       "MCP Streamable HTTP",
-      "CLI @concat/cli",
+      "CLI @lucasleguizamo/concat",
       "MIT license",
     ],
     terminalTitle: "~/project — concat",
     terminalLabel: "Example terminal session with the CONCAT CLI",
     terminal: [
-      { kind: "cmd", text: "npx @concat/cli login" },
+      { kind: "cmd", text: "npx @lucasleguizamo/concat login" },
       { kind: "ok", text: "signed in · ana@example.com" },
       { kind: "cmd", text: "concat connect gsc" },
       { kind: "out", text: "authorizing webmasters.readonly ..." },
@@ -177,7 +177,7 @@ export const en: Dictionary = {
       {
         title: "Login",
         text: "Once. Browser with PKCE; on a machine without a browser, device code. The token lives in the OS keychain.",
-        code: "npx -y @concat/cli@1 login",
+        code: "npx -y @lucasleguizamo/concat@1 login",
       },
       {
         title: "Connect a module",
