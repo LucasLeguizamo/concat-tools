@@ -57,13 +57,13 @@ export const es = {
       "AES-256-GCM",
       "OAuth 2.1 + PKCE",
       "MCP Streamable HTTP",
-      "CLI @concat/cli",
+      "CLI @lucasleguizamo/concat",
       "Licencia MIT",
     ],
     terminalTitle: "~/proyecto — concat",
     terminalLabel: "Ejemplo de sesión de terminal con la CLI de CONCAT",
     terminal: t([
-      { kind: "cmd", text: "npx @concat/cli login" },
+      { kind: "cmd", text: "npx @lucasleguizamo/concat login" },
       { kind: "ok", text: "sesión iniciada · ana@ejemplo.com" },
       { kind: "cmd", text: "concat connect gsc" },
       { kind: "out", text: "autorizando webmasters.readonly ..." },
@@ -181,7 +181,7 @@ export const es = {
       {
         title: "Login",
         text: "Una sola vez. Navegador con PKCE; en una máquina sin navegador, device code. El token queda en el keychain del sistema.",
-        code: "npx -y @concat/cli@1 login",
+        code: "npx -y @lucasleguizamo/concat@1 login",
       },
       {
         title: "Conecta un módulo",

@@ -25,7 +25,7 @@ describe("server.json", () => {
     expect(host === reversed || host.endsWith(`.${reversed}`)).toBe(true);
   });
 
-  it("no lista @concat/cli como paquete: es una CLI, no un servidor MCP stdio", () => {
+  it("no lista @lucasleguizamo/concat como paquete: es una CLI, no un servidor MCP stdio", () => {
     expect(server.packages).toBeUndefined();
   });
 });

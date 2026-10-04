@@ -8,7 +8,7 @@ description: Consulta Google Search Console, GA4 y otros módulos de Google del 
 Cliente delgado del mismo catálogo MCP del gateway. Solo lectura. Los comandos se generan desde el catálogo vivo (`tools/list`).
 
 ## Preparación (una vez, requiere humano)
-- `npx -y @concat/cli@1 login` abre el navegador. Sin navegador: `concat login --device` imprime una URL y un código de usuario (stderr); pídele al usuario que abra la URL y escriba el código a mano (el gateway no prellena el código). Si responde exit 4 (`rate_limited`), espera `retry_after` segundos.
+- `npx -y @lucasleguizamo/concat@1 login` abre el navegador. Sin navegador: `concat login --device` imprime una URL y un código de usuario (stderr); pídele al usuario que abra la URL y escriba el código a mano (el gateway no prellena el código). Si responde exit 4 (`rate_limited`), espera `retry_after` segundos.
 - `concat status` lista los módulos y su estado real. Si falta uno: `concat connect gsc ga4` (el usuario autoriza en el navegador).
 - `concat disconnect <módulo...>` desconecta (revoca el acceso en Google si ningún otro módulo lo usa). Hazlo solo si el usuario lo pide.
 - `concat tokens create --name n8n --scope gsc,ga4 --expires 90d` crea un token para n8n/CI (el secreto sale una sola vez por stdout); `tokens list`, `tokens revoke <id>`. No crees tokens sin que el usuario lo pida.

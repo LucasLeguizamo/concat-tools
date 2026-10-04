@@ -9,12 +9,12 @@ A module is a Google service (Search Console, GA4, Ads, Calendar...). The agent 
 ### With the CLI
 
 ```bash
-npx -y @concat/cli login            # browser, once. No browser: login --device
-npx -y @concat/cli connect gsc ga4  # opens Google's consent for those modules only
-npx -y @concat/cli status           # real state of every module
+npx -y @lucasleguizamo/concat login            # browser, once. No browser: login --device
+npx -y @lucasleguizamo/concat connect gsc ga4  # opens Google's consent for those modules only
+npx -y @lucasleguizamo/concat status           # real state of every module
 ```
 
-Once installed (`npm i -g @concat/cli`) the command is `concat`:
+Once installed (`npm i -g @lucasleguizamo/concat`) the command is `concat`:
 
 ```bash
 concat tools                                                        # live catalog
