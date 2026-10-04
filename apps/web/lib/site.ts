@@ -1,5 +1,5 @@
 // Constantes de la landing. Los valores marcados "confirmar" no existen aun en el repo.
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://onconcat.com/tools"; // sitio padre + basePath
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://onconcat.com";
 export const GITHUB_URL =
   process.env.NEXT_PUBLIC_GITHUB_URL ?? "https://github.com/LucasLeguizamo/concat-tools"; // confirmar repo
 export const WAITLIST_URL =
