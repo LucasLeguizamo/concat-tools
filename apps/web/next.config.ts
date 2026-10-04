@@ -1,13 +1,18 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Servida bajo el sitio padre: onconcat.com/tools (rewrite en concat-site).
-  basePath: "/tools",
   reactStrictMode: true,
   poweredByHeader: false,
   async redirects() {
-    // Sin middleware: "/tools" va al idioma por defecto (basePath se antepone solo).
-    return [{ source: "/", destination: "/es", permanent: false }];
+    // Sin middleware: "/" va al idioma por defecto.
+    // Rutas del sitio anterior (concat-site): /tools era el basePath; blog, founders y paginas de agencia se retiraron.
+    const retired = ["/blog", "/blog/:path*", "/founders/:path*", "/planes", "/nosotros", "/portfolio/:path*", "/contact", "/gateway"];
+    return [
+      { source: "/", destination: "/es", permanent: false },
+      { source: "/tools", destination: "/es", permanent: true },
+      { source: "/tools/:path*", destination: "/:path*", permanent: true },
+      ...retired.map((source) => ({ source, destination: "/es", permanent: true })),
+    ];
   },
   async headers() {
     return [

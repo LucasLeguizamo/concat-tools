@@ -1,13 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Silkscreen } from "next/font/google";
 import { notFound } from "next/navigation";
 import { getDictionary, isLocale, locales } from "@/dictionaries";
+import { mono, pixel } from "@/lib/fonts";
 import { GITHUB_URL, SITE_URL } from "@/lib/site";
 import "../globals.css";
 import "../sections.css";
-
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
-const pixel = Silkscreen({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-pixel", display: "swap" });
 
 export const dynamicParams = false;
 

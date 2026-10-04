@@ -1,0 +1,31 @@
+.legal { padding-block: 4rem 6rem; }
+.legal__head { max-width: 72ch; }
+.legal__eyebrow { color: var(--acc); font-size: 0.875rem; margin: 0; }
+.legal__title { font-family: var(--pix); font-size: clamp(1.75rem, 5vw, 3rem); line-height: 1.15; margin: 1rem 0 0; text-wrap: balance; }
+.legal__date { color: var(--faint); font-size: 0.8125rem; margin-top: 1rem; }
+.legal__intro { margin-top: 2rem; color: var(--dim); display: grid; gap: 1rem; }
+.legal__intro p { margin: 0; }
+.legal__grid { display: grid; gap: 3rem; margin-top: 4rem; }
+.legal__toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; font-size: 0.8125rem; }
+.legal__toc a { color: var(--dim); text-decoration: none; }
+.legal__toc a:hover { color: var(--fg); }
+.legal__sections { max-width: 72ch; display: grid; gap: 3.5rem; }
+.legal__sections h2 { font-size: 1.375rem; margin: 0; scroll-margin-top: 6rem; }
+.legal__num { color: var(--acc); font-size: 0.875rem; margin-right: 0.75rem; }
+.legal-body { margin-top: 1.25rem; color: var(--dim); display: grid; gap: 1rem; }
+.legal-body p, .legal-body ul, .legal-body ol { margin: 0; }
+.legal-body a { color: var(--acc); text-underline-offset: 4px; }
+.legal-body strong { color: var(--fg); }
+.legal-body ul, .legal-body ol { padding-left: 1.5rem; display: grid; gap: 0.5rem; }
+.legal-body h3 { color: var(--fg); font-size: 1rem; margin: 0.5rem 0 0; }
+.legal-body table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8125rem; }
+.legal-body th { border-bottom: 1px solid var(--line-2); padding: 0.75rem 1rem 0.75rem 0; color: var(--fg); }
+.legal-body td { border-bottom: 1px solid var(--line); padding: 0.75rem 1rem 0.75rem 0; vertical-align: top; }
+.legal-body code { background: var(--panel); border: 1px solid var(--line); padding: 0.1em 0.4em; font-size: 0.85em; color: var(--fg); }
+.legal-body blockquote { border-left: 2px solid var(--acc); margin: 0; padding-left: 1rem; color: var(--fg); }
+.legal-scroll { overflow-x: auto; }
+.legal-dim { color: var(--faint); }
+@media (min-width: 1024px) {
+  .legal__grid { grid-template-columns: 16rem 1fr; }
+  .legal__toc { position: sticky; top: 6rem; align-self: start; }
+}
