@@ -3,9 +3,9 @@ import type { Dictionary } from "./es";
 export const en: Dictionary = {
   lang: "en",
   meta: {
-    title: "CONCAT Tools | Google for AI agents (MCP + CLI, open source)",
+    title: "CONCAT Tools | Open source connectors for AI agents (CLI + MCP)",
     description:
-      "Open source gateway that connects Claude, Cursor, n8n and your terminal to Search Console, GA4, Google Ads and Workspace. Read-only, encrypted tokens, errors that tell you how to fix them.",
+      "A collection of simple, open source connectors: your agent uses Search Console, GA4, Google Ads and Workspace from a CLI or MCP. Read-only, MIT licensed.",
     ogLocale: "en_US",
   },
   common: {
@@ -17,7 +17,7 @@ export const en: Dictionary = {
     exampleData: "Sample data",
   },
   nav: {
-    tagline: "Google, for agents.",
+    tagline: "Connectors for agents.",
     label: "Main",
     links: {
       problem: "Problem",
@@ -30,11 +30,11 @@ export const en: Dictionary = {
     langLabel: "Language",
   },
   hero: {
-    eyebrow: "Remote MCP + CLI · open source · MIT",
-    titleMain: "Your agent can now read your Google.",
-    titleAccent: "Properly.",
-    sub: "A gateway that connects Claude, Cursor, n8n and your terminal to Search Console, GA4, Google Ads and Workspace. Read-only, encrypted tokens, and errors that tell you which screen fixes the permission.",
-    ctaPrimary: "Connect my Google",
+    eyebrow: "CLI + MCP · 100% open source · MIT",
+    titleMain: "Simple connectors for your agent.",
+    titleAccent: "From the terminal.",
+    sub: "An open source collection of connectors: one CLI and one MCP so Claude, Cursor, n8n or your shell can use Search Console, GA4, Google Ads and Workspace. Google first; more coming. Read-only, with errors that explain how to fix themselves.",
+    ctaPrimary: "Install the CLI",
     ctaSecondary: "View the code",
     facts: [
       "Read-only",

@@ -19,9 +19,9 @@ const moduleCopy: Record<ModuleId, { name: string; extra: string }> = {
 export const es = {
   lang: "es",
   meta: {
-    title: "CONCAT Tools | Google para agentes de IA (MCP + CLI, open source)",
+    title: "CONCAT Tools | Conectores open source para agentes de IA (CLI + MCP)",
     description:
-      "Gateway open source que conecta Claude, Cursor, n8n y tu terminal con Search Console, GA4, Google Ads y Workspace. Solo lectura, tokens cifrados, errores que dicen cómo arreglarlos.",
+      "Una colección de conectores simples y open source: tu agente usa Search Console, GA4, Google Ads y Workspace desde una CLI o MCP. Solo lectura, licencia MIT.",
     ogLocale: "es_ES",
   },
   common: {
@@ -33,7 +33,7 @@ export const es = {
     exampleData: "Datos de ejemplo",
   },
   nav: {
-    tagline: "Google, para agentes.",
+    tagline: "Conectores para agentes.",
     label: "Principal",
     links: {
       problem: "Problema",
@@ -46,11 +46,11 @@ export const es = {
     langLabel: "Idioma",
   },
   hero: {
-    eyebrow: "MCP remoto + CLI · open source · MIT",
-    titleMain: "Tu agente ya puede leer tu Google.",
-    titleAccent: "Bien.",
-    sub: "Un gateway que conecta Claude, Cursor, n8n y tu terminal con Search Console, GA4, Google Ads y Workspace. Solo lectura, tokens cifrados y errores que te dicen en qué pantalla arreglar el permiso.",
-    ctaPrimary: "Conectar mi Google",
+    eyebrow: "CLI + MCP · 100% open source · MIT",
+    titleMain: "Conectores simples para tu agente.",
+    titleAccent: "Desde la terminal.",
+    sub: "Una colección open source de conectores: una CLI y un MCP para que Claude, Cursor, n8n o tu shell usen Search Console, GA4, Google Ads y Workspace. Empezamos por Google; vienen más. Solo lectura y errores que dicen cómo arreglarse.",
+    ctaPrimary: "Instalar la CLI",
     ctaSecondary: "Ver el código",
     facts: [
       "Solo lectura",
