@@ -1,0 +1,23 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "gateway": {
+      "root": "apps/gateway",
+      "framework": "nextjs"
+    },
+    "web": {
+      "root": "apps/web",
+      "framework": "nextjs"
+    }
+  },
+  "crons": [{ "path": "/api/cron/health", "schedule": "0 6 * * *" }],
+  "rewrites": [
+    { "source": "/api/cron/(.*)", "destination": { "service": "gateway" } },
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "gw.onconcat.com" }],
+      "destination": { "service": "gateway" }
+    },
+    { "source": "/(.*)", "destination": { "service": "web" } }
+  ]
+}
