@@ -1,7 +1,7 @@
 # NOTES (desviaciones y decisiones vs. la spec)
 
 - TypeScript fijado a ^6 (latest es 7.0.2): `typescript-eslint` 8.x no soporta TS 7.
-- ESLint fijado a ^9 (latest 10.x): `eslint-plugin-react` (via eslint-config-next 16) no es compatible con ESLint 10.
+- ESLint: `packages/cli` en 10.x; `apps/*` fijados a ^9 porque `eslint-plugin-react` (via eslint-config-next 16) no soporta ESLint 10. Dependabot ignora esos majors (`.github/dependabot.yml`).
 - Next 16: `next lint` ya no existe; lint = `eslint .` con flat config.
 - pnpm bloquea scripts de build de esbuild/unrs-resolver (aviso en install); no son necesarios para build/test/lint.
 - `db/schema.sql` es un archivo idempotente (no migraciones numeradas) en M1. Agregadas a la spec: `pending_auth`, `gateway_tokens.name`.
