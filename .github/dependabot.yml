@@ -4,7 +4,6 @@ updates:
     directories:
       - "/"
       - "/packages/*"
-      - "/apps/*"
     schedule:
       interval: weekly
     cooldown:
@@ -13,6 +12,27 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # typescript-eslint 8.x exige typescript <6.1. Quitar cuando soporte TS 7.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+  - package-ecosystem: npm
+    directories:
+      - "/apps/*"
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+      # eslint-config-next arrastra eslint-plugin-react (peer eslint <=9). Quitar cuando soporte ESLint 10.
+      - dependency-name: eslint
+        update-types: [version-update:semver-major]
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
