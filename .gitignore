@@ -10,3 +10,6 @@ next-env.d.ts
 !.env.example
 .DS_Store
 .vercel
+
+# Impeccable: snapshots locales de critique/live
+.impeccable/
