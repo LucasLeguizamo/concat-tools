@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { t } from "../copy";
 
@@ -7,10 +8,10 @@ export const buttonSecondary = "btn";
 
 export function Brand() {
   return (
-    <a href="/dashboard" className="brand">
+    <Link href="/" className="brand">
       <span className="brand__mark" aria-hidden />
       CONCAT <small>google gateway</small>
-    </a>
+    </Link>
   );
 }
 
@@ -84,21 +85,22 @@ export function Notice({ tone, title, children }: { tone: "ok" | "error" | "warn
       {tone === "ok" ? "ok" : tone === "error" ? "error" : "!"}
     </span>
   );
+  // div, no p: el contenido puede traer bloques (p. ej. un comando copiable) y <div> dentro de <p> rompe la hidratacion.
   return (
     <div className="notice" data-tone={tone} role={tone === "error" ? "alert" : "status"}>
       {title ? (
         <>
-          <p className="notice__title">
+          <div className="notice__title">
             {tag}
             <strong>{title}</strong>
-          </p>
-          {children ? <p>{children}</p> : null}
+          </div>
+          {children ? <div className="notice__body">{children}</div> : null}
         </>
       ) : (
-        <p>
+        <div>
           {tag}
           {children}
-        </p>
+        </div>
       )}
     </div>
   );

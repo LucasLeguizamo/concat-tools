@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "../../lib/auth/session";
 import { getModuleStatuses } from "../../lib/connection";
 import { t } from "../../lib/copy";
-import { disconnectAction } from "./actions";
+import { disconnectAction, recheckAction } from "./actions";
 import { DashboardView, type DashboardParams } from "./view";
 
 export const dynamic = "force-dynamic";
@@ -12,5 +12,5 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const user = await getSessionUser();
   if (!user) redirect("/login");
   const statuses = await getModuleStatuses(user.id, () => true);
-  return <DashboardView email={user.email} statuses={statuses} params={await searchParams} disconnect={disconnectAction} />;
+  return <DashboardView email={user.email} statuses={statuses} params={await searchParams} disconnect={disconnectAction} recheck={recheckAction} />;
 }

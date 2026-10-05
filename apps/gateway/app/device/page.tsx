@@ -159,7 +159,7 @@ export default async function DevicePage({ searchParams }: { searchParams: Promi
           </SubmitButton>
         </form>
         <form action={cancel}>
-          <SubmitButton className="btn" pending={t.device.deny}>
+          <SubmitButton className="btn" pending={t.device.denying}>
             {t.device.deny}
           </SubmitButton>
         </form>

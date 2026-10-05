@@ -20,9 +20,20 @@ describe("dashboard: avisos", () => {
 
   it("tras conectar: ok con recursos y vuelta a la terminal; si no quedo conectado, aviso con el motivo", () => {
     expect(bannerFor({ module: "gsc" }, statuses)).toMatchObject({ tone: "ok", title: "Search Console conectado" });
-    expect(bannerFor({ module: "gsc" }, statuses)?.body).toContain("terminal");
+    expect(bannerFor({ module: "gsc" }, statuses)).toMatchObject({ done: true });
     expect(bannerFor({ module: "ga4" }, statuses)).toMatchObject({ tone: "warn", body: "Sin propiedades." });
     expect(bannerFor({ module: "nope" }, statuses)).toBeNull();
+  });
+
+  it("volver de Google sin conectar => 'no se completo', nunca un aviso vacio", () => {
+    const b = bannerFor({ module: "ads" }, [...statuses, entry("ads", "not_connected")]);
+    expect(b).toMatchObject({ tone: "warn", title: "Google Ads: la conexión no se completó" });
+    expect(b?.body).not.toBe("");
+  });
+
+  it("errores de 'volver a comprobar' nombran el modulo", () => {
+    expect(bannerFor({ error: "rate_limited", failed: "ga4" }, statuses)?.body).toContain("Analytics 4");
+    expect(bannerFor({ checked: "ga4" }, statuses)).toMatchObject({ tone: "warn", body: "Sin propiedades." });
   });
 
   it("orden por urgencia: permiso perdido primero, no conectados al final", () => {

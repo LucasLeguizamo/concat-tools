@@ -14,7 +14,9 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
 
   return (
     <Shell title={t.login.title} cmd="concat login">
-      {error ? <Notice tone="error">{t.login.errors[error] ?? t.login.genericError}</Notice> : null}
+      {error ? (
+        <Notice tone={error === "denied" ? "warn" : "error"}>{t.login.errors[error] ?? t.login.genericError}</Notice>
+      ) : null}
       <p>{t.login.body}</p>
       <div className="actions">
         <a href={`/google/start?next=${encodeURIComponent(target)}`} className={button}>

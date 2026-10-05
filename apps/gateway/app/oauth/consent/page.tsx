@@ -98,7 +98,7 @@ export default async function ConsentPage({ searchParams }: { searchParams: Prom
         <SubmitButton className={button} name="decision" value="approve" pending={t.consent.approving}>
           {t.consent.approve}
         </SubmitButton>
-        <SubmitButton className={buttonSecondary} name="decision" value="deny" pending={t.consent.deny}>
+        <SubmitButton className={buttonSecondary} name="decision" value="deny" pending={t.consent.denying}>
           {t.consent.deny}
         </SubmitButton>
       </form>

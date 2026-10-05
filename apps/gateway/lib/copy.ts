@@ -38,7 +38,7 @@ export const es = {
     not_connected: null,
     authorized: "Autorizado, falta la primera consulta real que confirma que ves datos. Recarga en unos instantes.",
     connected: null,
-    no_resources: null,
+    no_resources: "Tu cuenta no ve ningún recurso de este servicio. Pide acceso en la administración del servicio y vuelve a comprobar.",
     scope_lost: "Falta el permiso de este módulo en Google. Reconecta; solo se pide ese permiso.",
     expired: "El acceso a Google expiró o fue revocado. Reconecta para renovarlo.",
   } satisfies Record<ModuleStatus, string | null>,
@@ -46,11 +46,13 @@ export const es = {
   dashboard: {
     title: "Módulos",
     windowTitle: "concat status",
-    signedInAs: "Sesión",
+    signedInAs: "Cuenta de Google",
     signOut: "Cerrar sesión",
     connectedCount: (n: number, total: number) => `${n}/${total} conectados`,
     betaCount: (n: number, total: number) => `beta ${n}/${total}`,
     attention: (n: number) => (n === 1 ? "1 módulo requiere atención." : `${n} módulos requieren atención.`),
+    attentionCmd: "Reconecta los que perdieron acceso de una vez:",
+    notConnected: "Sin conectar",
     available: "Disponibles",
     beta: "Beta cerrada · Google Workspace",
     betaNote: "Solo funcionan con cuentas en la lista de prueba de Google mientras se verifica la app.",
@@ -59,6 +61,9 @@ export const es = {
     lastProbe: "último chequeo",
     connect: "Conectar",
     reconnect: "Reconectar",
+    recheck: "Volver a comprobar",
+    rechecking: "Comprobando…",
+    checkedTitle: (name: string, status: string) => `${name}: ${status}`,
     disconnect: "Desconectar",
     disconnectConfirm: "Sí, desconectar",
     disconnecting: "Desconectando…",
@@ -70,10 +75,16 @@ export const es = {
     copied: "Copiado",
     connectedTitle: (name: string) => `${name} conectado`,
     connectedBody: (resources: string | null) =>
-      `${resources ? `Verificado con una consulta real: ${resources}. ` : ""}Ya puedes volver a tu terminal; tu agente lo usa en su próxima llamada.`,
+      `${resources ? `Verificado con una consulta real: ${resources}. ` : ""}Tu agente lo usa en su próxima llamada.`,
+    doneHint: "Puedes cerrar esta pestaña y volver a tu terminal.",
+    notCompletedTitle: (name: string) => `${name}: la conexión no se completó`,
+    notCompletedBody: "Google no confirmó el permiso. Vuelve a intentarlo desde la tarjeta del módulo.",
     disconnectedTitle: (name: string) => `${name} desconectado`,
     disconnectFailed: (name: string) => `No se pudo desconectar ${name}. Reintenta en unos instantes.`,
     unknownError: "No se pudo completar la acción. Reintenta en unos instantes.",
+    recheckFailed: (name: string) => `No se pudo comprobar ${name}. Reintenta en unos instantes.`,
+    rateLimited: (name: string) => `Demasiadas comprobaciones de ${name}. Espera un minuto.`,
+    copyFallback: "Selecciona el comando y cópialo",
   },
 
   login: {
@@ -82,7 +93,7 @@ export const es = {
     cta: "Continuar con Google",
     errors: {
       state: "La sesión de login expiró o no coincide. Intenta de nuevo.",
-      denied: "Cancelaste el acceso en Google.",
+      denied: "Cancelaste el acceso en Google. Puedes volver a intentarlo o cerrar esta pestaña.",
       google: "Google rechazó la solicitud. Intenta de nuevo.",
       no_refresh: "Google no entregó permiso offline. Revoca el acceso de CONCAT en tu cuenta de Google e intenta de nuevo.",
       session: "Tu sesión cambió durante el proceso. Inicia sesión de nuevo.",
@@ -128,6 +139,7 @@ export const es = {
     approve: "Aprobar",
     approving: "Aprobando…",
     deny: "Denegar",
+    denying: "Denegando…",
   },
 
   device: {
@@ -151,6 +163,12 @@ export const es = {
     approve: "Aprobar",
     approving: "Aprobando…",
     deny: "Denegar",
+    denying: "Denegando…",
+  },
+
+  error: {
+    title: "No se pudo continuar",
+    next: "Vuelve a iniciar el proceso desde tu terminal o tu aplicación (por ejemplo",
   },
 
   home: {

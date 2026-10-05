@@ -30,7 +30,9 @@ export default async function ConnectPage({
 
   return (
     <Shell title={t.connect.title(name)} cmd={`concat connect ${mod.id}`}>
-      {error ? <Notice tone="error">{t.connect.errors[error] ?? t.connect.genericError}</Notice> : null}
+      {error ? (
+        <Notice tone={error === "denied" ? "warn" : "error"}>{t.connect.errors[error] ?? t.connect.genericError}</Notice>
+      ) : null}
       {mod.beta ? (
         <Notice tone="warn" title={t.connect.betaTitle}>
           {t.connect.betaBody}

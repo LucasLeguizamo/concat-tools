@@ -118,7 +118,7 @@ ul {
 .win {
   border: 2px solid var(--line-2);
   background: var(--panel);
-  box-shadow: 8px 8px 0 var(--line);
+  box-shadow: 8px 8px 0 var(--line-2);
 }
 .win__bar {
   display: flex;
@@ -160,7 +160,7 @@ ul {
   text-wrap: balance;
 }
 .title::before {
-  content: "> ";
+  content: "> " / "";
   color: var(--acc);
 }
 .dim {
@@ -215,10 +215,23 @@ ul {
   border: 1px solid var(--line-2);
   background: var(--bg);
 }
-.notice p {
-  margin: 0;
+.notice > div {
+  max-width: 72ch;
 }
-.notice p + p {
+.section__note,
+.done p {
+  max-width: 72ch;
+}
+.notice__cmd {
+  display: block;
+  margin-top: 0.6rem;
+  color: var(--dim);
+}
+.notice__cmd .cmd {
+  margin-top: 0.4rem;
+  max-width: 36rem;
+}
+.notice__body {
   margin-top: 0.35rem;
   color: var(--dim);
 }
@@ -596,21 +609,104 @@ ul {
   background: var(--amber);
   animation: blink 1s steps(2) infinite;
 }
+/* Beta en tono neutro: el ambar queda solo para "requiere accion". */
 .tag {
   font-family: var(--pix);
   font-size: 0.75rem;
-  color: var(--amber);
-  border: 1px solid var(--amber);
+  color: var(--dim);
+  border: 1px solid var(--line-ctl);
   padding: 0 0.35rem;
   text-transform: uppercase;
 }
 
+/* Cierre feliz: "listo, vuelve a tu terminal" se distingue de cualquier aviso. */
+.done {
+  margin: 0 0 1.25rem;
+  padding: 1rem 1.15rem;
+  border: 2px solid var(--acc);
+  background: var(--bg);
+  box-shadow: 6px 6px 0 var(--acc-dim);
+}
+.done p {
+  margin: 0;
+}
+.done__title {
+  font-family: var(--pix);
+  font-size: 1.05rem;
+  color: #fff;
+}
+.done__title .notice__tag {
+  color: var(--acc);
+  font-family: var(--mono);
+}
+.done p + p {
+  margin-top: 0.35rem;
+  color: var(--dim);
+}
+.done .done__hint {
+  color: var(--acc);
+}
+
+/* Modulos sin conectar: filas compactas debajo de las tarjetas con estado. */
+.rows {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  border-top: 1px solid var(--line-2);
+}
+.mods + .rows {
+  margin-top: 1.25rem;
+}
+.row {
+  display: grid;
+  grid-template-columns: minmax(10rem, 14rem) minmax(0, 22rem) auto;
+  align-items: center;
+  gap: 0.6rem 1.25rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--line-2);
+}
+.row__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  font-family: var(--pix);
+  font-size: 0.95rem;
+  color: #fff;
+}
+.row__name .tag {
+  margin-left: 0.25rem;
+}
+.row .btn {
+  justify-self: end;
+}
+.mod__link {
+  align-self: center;
+  font-size: 0.82rem;
+  color: var(--dim);
+}
+.mod__link:hover {
+  color: #fff;
+}
+.danger__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* Desconectar: dos pasos sin JS (<details>), el segundo explica la consecuencia. */
 .danger {
-  flex-basis: 100%;
-}
-.mod__actions a + .danger {
-  flex-basis: auto;
+  margin-top: 0.15rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--line-2);
 }
 .danger > summary {
   display: inline-flex;
@@ -648,6 +744,13 @@ ul {
 }
 
 @media (max-width: 40rem) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .row .cmd {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
   .who {
     align-items: stretch;
     width: 100%;

@@ -44,4 +44,6 @@ export const LIMITS = {
   toolCall: { limit: 60, windowS: 60 },
   /** intentos de user_code por usuario (sesion) */
   userCode: { limit: 5, windowS: 600 },
+  /** "Volver a comprobar" del dashboard (cada uno es una llamada real a Google) por usuario x modulo */
+  recheck: { limit: 6, windowS: 60 },
 } as const;

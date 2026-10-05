@@ -12,6 +12,7 @@ export default function Home() {
         label={t.dashboard.cliLabel}
         copy={t.dashboard.copy}
         copied={t.dashboard.copied}
+        fallback={t.dashboard.copyFallback}
       />
       <div className="actions">
         <a href="/dashboard" className="btn">
