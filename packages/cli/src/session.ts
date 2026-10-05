@@ -17,7 +17,14 @@ export interface Session {
 /** Token de API del gateway (`cgw_…`, `concat tokens create`) para CI: se envía tal cual, sin login ni refresh. */
 export const API_TOKEN_RE = /^cgw_[A-Za-z0-9_-]{20,}$/;
 
-export function createSession(gateway: string, store: CredentialStore, net: Net, apiToken?: string): Session {
+export function createSession(
+  gateway: string,
+  store: CredentialStore,
+  net: Net,
+  apiToken?: string,
+  /** Clave en el almacén (gateway o `gateway#perfil`). */
+  key = gateway,
+): Session {
   let md: ServerMetadata | undefined;
   let current: Credentials | null | undefined;
 
@@ -26,18 +33,18 @@ export function createSession(gateway: string, store: CredentialStore, net: Net,
 
   async function accessToken(force = false): Promise<string> {
     if (apiToken) return apiToken;
-    current ??= await store.load(gateway);
+    current ??= await store.load(key);
     if (!current) throw notAuthenticated();
     if (!force && fresh(current)) return current.access_token;
     const used = current.refresh_token;
     if (!used) throw notAuthenticated("La sesión expiró.");
     try {
       current = await refreshTokens(await metadata(), net, used);
-      await store.save(gateway, current);
+      await store.save(key, current);
       return current.access_token;
     } catch (err) {
       // Con rotación, otro proceso pudo refrescar antes que nosotros.
-      const other = await store.load(gateway);
+      const other = await store.load(key);
       if (other && other.refresh_token !== used && fresh(other)) {
         current = other;
         return other.access_token;

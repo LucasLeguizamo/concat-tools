@@ -4,12 +4,23 @@ import type { CredentialStore, Credentials } from "../src/store.js";
 
 export const GATEWAY = "https://gw.test";
 
-export function memoryStore(initial?: Credentials): CredentialStore & { creds: Credentials | null } {
+/** `creds` es la sesión por defecto (clave = gateway); `byKey` guarda todas las claves (perfiles). */
+export function memoryStore(
+  initial?: Credentials,
+): CredentialStore & { creds: Credentials | null; byKey: Map<string, Credentials> } {
+  const byKey = new Map<string, Credentials>();
   const s = {
+    byKey,
     creds: initial ?? null,
-    load: async () => s.creds,
-    save: async (_g: string, c: Credentials) => void (s.creds = c),
-    clear: async () => void (s.creds = null),
+    load: async (k: string) => (k.includes("#") ? (byKey.get(k) ?? null) : s.creds),
+    save: async (k: string, c: Credentials) => {
+      byKey.set(k, c);
+      if (!k.includes("#")) s.creds = c;
+    },
+    clear: async (k: string) => {
+      byKey.delete(k);
+      if (!k.includes("#")) s.creds = null;
+    },
   };
   return s;
 }
@@ -51,6 +62,7 @@ export interface Harness {
   out: string[];
   err: string[];
   opened: string[];
+  copied: string[];
   store: ReturnType<typeof memoryStore>;
   clock: { t: number };
 }
@@ -62,11 +74,13 @@ export function harness(opts: {
   client?: ToolClient;
   openBrowser?: (url: string) => void;
   env?: NodeJS.ProcessEnv;
+  cwd?: string;
 } = {}): Harness {
   const clock = { t: 1_000_000 };
   const out: string[] = [];
   const err: string[] = [];
   const opened: string[] = [];
+  const copied: string[] = [];
   const store = memoryStore(
     opts.creds === null ? undefined : (opts.creds ?? { access_token: "at-1", refresh_token: "rt-1", expires_at: clock.t + 3_600_000 }),
   );
@@ -84,12 +98,17 @@ export function harness(opts: {
       opened.push(u);
       opts.openBrowser?.(u);
     },
+    copy: async (t) => {
+      copied.push(t);
+      return true;
+    },
+    cwd: opts.cwd ?? "/",
     connectTools: async () => {
       if (!opts.client) throw new Error("sin cliente MCP en este test");
       return opts.client;
     },
   };
-  return { deps, out, err, opened, store, clock };
+  return { deps, out, err, opened, copied, store, clock };
 }
 
 export function fakeClient(tools: ToolInfo[], onCall: (name: string, args: Record<string, unknown>) => ToolCallResult) {

@@ -3,7 +3,7 @@ import { setTimeout as sleep } from "node:timers/promises";
 import { connectMcp, type ToolClient } from "./mcp.js";
 import type { Net } from "./oauth.js";
 import type { Session } from "./session.js";
-import { createStore, type CredentialStore } from "./store.js";
+import { createStore, realExec, type CredentialStore } from "./store.js";
 
 /** Todo lo que toca el mundo exterior, inyectable para tests. */
 export interface Deps {
@@ -13,6 +13,9 @@ export interface Deps {
   stdout: { write(s: string): void; isTTY: boolean };
   stderr: { write(s: string): void };
   openBrowser(url: string): void;
+  /** Copia texto al portapapeles; false si no hay herramienta disponible. */
+  copy(text: string): Promise<boolean>;
+  cwd: string;
   connectTools(session: Session): Promise<ToolClient>;
 }
 
@@ -33,6 +36,24 @@ function openBrowser(url: string): void {
   }
 }
 
+/** pbcopy / clip / wl-copy / xclip, el primero que funcione. El texto va por stdin, nunca en argv. */
+async function copy(text: string): Promise<boolean> {
+  const candidates: Array<[string, string[]]> =
+    process.platform === "darwin"
+      ? [["pbcopy", []]]
+      : process.platform === "win32"
+        ? [["clip", []]]
+        : [["wl-copy", []], ["xclip", ["-selection", "clipboard"]], ["xsel", ["--clipboard", "--input"]]];
+  for (const [cmd, args] of candidates) {
+    try {
+      if ((await realExec(cmd, args, text)).code === 0) return true;
+    } catch {
+      // probar el siguiente
+    }
+  }
+  return false;
+}
+
 export function realDeps(): Deps {
   return {
     env: process.env,
@@ -41,6 +62,8 @@ export function realDeps(): Deps {
     stdout: { write: (s) => void process.stdout.write(s), isTTY: process.stdout.isTTY === true },
     stderr: { write: (s) => void process.stderr.write(s) },
     openBrowser,
+    copy,
+    cwd: process.cwd(),
     connectTools: connectMcp,
   };
 }

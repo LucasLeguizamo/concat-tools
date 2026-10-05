@@ -19,21 +19,40 @@ const done = (ctx: Ctx, human: string, value: unknown): void => {
   else ctx.deps.stdout.write(`${human}\n`);
 };
 
+const profileNote = (ctx: Ctx): string => (ctx.profile ? ` (perfil ${ctx.profile})` : "");
+
+/** Abre la URL, o con --copy la copia al portapapeles para abrirla en otro navegador/perfil. */
+const opener = (ctx: Ctx, copy: boolean | undefined) => async (url: string) => {
+  if (!copy) return ctx.deps.openBrowser(url);
+  log(
+    ctx,
+    (await ctx.deps.copy(url))
+      ? "Link copiado al portapapeles: pégalo en el navegador o perfil con la cuenta que quieres usar."
+      : "No se pudo copiar al portapapeles: copia el link de arriba a mano.",
+  );
+};
+
 export async function login(ctx: Ctx, args: string[]): Promise<number> {
-  const { values } = parse(args, { device: { type: "boolean" } });
+  const { values } = parse(args, { device: { type: "boolean" }, copy: { type: "boolean" } });
+  if (values.device && values.copy) throw usageError("Usa --device o --copy, no ambos.");
   const md = await discover(ctx.gateway, ctx.deps.net);
-  const io = { log: (l: string) => log(ctx, l), openBrowser: (u: string) => ctx.deps.openBrowser(u) };
+  if (ctx.profile) log(ctx, `Perfil: ${ctx.profile}. Inicia sesión con la cuenta de Google de este perfil.`);
+  const io = { log: (l: string) => log(ctx, l), openBrowser: opener(ctx, values.copy) };
   const creds = values.device
     ? await loginDevice(md, ctx.deps.net, io)
     : await loginLoopback(md, ctx.deps.net, io);
-  await ctx.deps.store.save(ctx.gateway, creds);
-  done(ctx, `Sesión iniciada en ${ctx.gateway}.`, { logged_in: true, gateway: ctx.gateway });
+  await ctx.deps.store.save(ctx.key, creds);
+  done(ctx, `Sesión iniciada en ${ctx.gateway}${profileNote(ctx)}.`, {
+    logged_in: true,
+    gateway: ctx.gateway,
+    profile: ctx.profile ?? null,
+  });
   return EXIT.OK;
 }
 
 export async function logout(ctx: Ctx, args: string[]): Promise<number> {
   parse(args, {});
-  const creds = await ctx.deps.store.load(ctx.gateway);
+  const creds = await ctx.deps.store.load(ctx.key);
   const token = creds?.refresh_token ?? creds?.access_token;
   if (token) {
     try {
@@ -42,8 +61,8 @@ export async function logout(ctx: Ctx, args: string[]): Promise<number> {
       // sin red o sin metadata: igual se borra la copia local
     }
   }
-  await ctx.deps.store.clear(ctx.gateway);
-  done(ctx, "Sesión cerrada.", { logged_in: false, gateway: ctx.gateway });
+  await ctx.deps.store.clear(ctx.key);
+  done(ctx, `Sesión cerrada${profileNote(ctx)}.`, { logged_in: false, gateway: ctx.gateway, profile: ctx.profile ?? null });
   return EXIT.OK;
 }
 
@@ -69,6 +88,7 @@ export async function status(ctx: Ctx, args: string[]): Promise<number> {
   const { body, modules } = await fetchModules(ctx);
   if (ctx.json) emit(ctx, body);
   else {
+    if (ctx.profile) log(ctx, `Perfil: ${ctx.profile}`);
     ctx.deps.stdout.write(
       `${renderTable(
         modules.map((m) => ({
@@ -88,7 +108,7 @@ const MODULE_ID = /^[a-z][a-z0-9_]*$/;
 
 /** Abre /google/start por módulo y espera (polling) a que el probe lo deje conectado. */
 export async function connect(ctx: Ctx, args: string[]): Promise<number> {
-  const { values, positionals } = parse(args, { timeout: { type: "string" } }, true);
+  const { values, positionals } = parse(args, { timeout: { type: "string" }, copy: { type: "boolean" } }, true);
   if (positionals.length === 0) throw usageError("Uso: concat connect <módulo...>  (p. ej. gsc ga4)");
   for (const m of positionals) if (!MODULE_ID.test(m)) throw usageError(`Módulo inválido: ${m}`);
   const timeoutS = values.timeout === undefined ? 180 : Number(values.timeout);
@@ -112,7 +132,7 @@ export async function connect(ctx: Ctx, args: string[]): Promise<number> {
     const url = `${ctx.gateway}/google/start?module=${encodeURIComponent(id)}`;
     log(ctx, `${id}: autoriza en el navegador. Si no se abre, visita:`);
     log(ctx, `  ${url}`);
-    ctx.deps.openBrowser(url);
+    await opener(ctx, values.copy)(url);
 
     const deadline = ctx.deps.net.now() + timeoutS * 1000;
     let final: ModuleRow | undefined;
