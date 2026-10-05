@@ -16,7 +16,7 @@
   },
   "type": "module",
   "bin": {
-    "concat": "./dist/bin.js"
+    "concat": "dist/bin.js"
   },
   "files": [
     "dist",
