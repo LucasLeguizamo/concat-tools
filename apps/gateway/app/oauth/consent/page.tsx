@@ -3,9 +3,14 @@ import { resolveClientForRedirect } from "../../../lib/auth/clients";
 import { redirectWithParams } from "../../../lib/auth/http";
 import { oauthServer } from "../../../lib/auth/oauth-server";
 import { getSessionUser } from "../../../lib/auth/session";
-import { button, buttonSecondary, describeScope, Shell, SwitchAccount, UUID_RE } from "../../../lib/auth/ui";
+import { SubmitButton } from "../../../lib/auth/client-ui";
+import { button, buttonSecondary, describeScope, Identity, Shell, SwitchAccount, UUID_RE } from "../../../lib/auth/ui";
+import { scopeAllows } from "../../../lib/bearer";
+import { getModuleStatuses } from "../../../lib/connection";
+import { moduleName, t } from "../../../lib/copy";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: t.consent.title };
 
 async function decide(formData: FormData) {
   "use server";
@@ -41,8 +46,8 @@ export default async function ConsentPage({ searchParams }: { searchParams: Prom
   const pending = UUID_RE.test(id) ? await oauthServer().getPending(id) : null;
   if (!pending) {
     return (
-      <Shell title="Solicitud expirada">
-        <p>Esta solicitud de autorizacion no existe o ya expiro. Vuelve a iniciarla desde tu aplicacion.</p>
+      <Shell title={t.consent.expiredTitle}>
+        <p>{t.consent.expiredBody}</p>
       </Shell>
     );
   }
@@ -52,28 +57,50 @@ export default async function ConsentPage({ searchParams }: { searchParams: Prom
     clientName = (await resolveClientForRedirect(pending.clientId, pending.redirectUri)).name;
   } catch {
     return (
-      <Shell title="Cliente no valido">
-        <p>No se pudo validar la aplicacion que solicita acceso.</p>
+      <Shell title={t.consent.invalidTitle}>
+        <p>{t.consent.invalidBody}</p>
       </Shell>
     );
   }
   const redirectHost = new URL(pending.redirectUri).host;
+  // Que significa el scope HOY: los modulos ya conectados que la aplicacion podra leer.
+  const scope = pending.scope.split(/[\s,]+/).filter(Boolean);
+  const reachable = (await getModuleStatuses(user.id, (m) => scopeAllows(scope, m)).catch(() => []))
+    .filter((m) => m.status === "connected")
+    .map((m) => moduleName(m.id));
 
   return (
-    <Shell title="Autorizar aplicacion">
-      <p>
-        <strong>{clientName}</strong> quiere acceder a tu cuenta del gateway como <strong>{user.email}</strong>.
+    <Shell title={t.consent.title}>
+      <p className="lede">
+        <strong>{clientName}</strong> {t.consent.wants}:
       </p>
-      <ul>
-        <li>Cliente: <code>{pending.clientId}</code></li>
-        <li>Volvera a: <code>{redirectHost}</code></li>
-        <li>Permisos: {describeScope(pending.scope)}</li>
-      </ul>
-      <p>Solo lectura. Nunca veras ni compartiras tokens de Google con la aplicacion.</p>
+      <Identity email={user.email} label={t.dashboard.signedInAs} />
+      <dl className="facts">
+        <dt>{t.consent.client}</dt>
+        <dd>
+          <code>{pending.clientId}</code>
+        </dd>
+        <dt>{t.consent.returnsTo}</dt>
+        <dd>
+          <code>{redirectHost}</code>
+        </dd>
+        <dt>{t.consent.scope}</dt>
+        <dd>
+          {describeScope(pending.scope)}
+          <span className="facts__sub">
+            {reachable.length ? t.consent.today(reachable.join(", ")) : t.consent.todayNone}
+          </span>
+        </dd>
+      </dl>
+      <p className="dim">{t.consent.readOnly}</p>
       <form action={decide} className="actions">
         <input type="hidden" name="pending" value={id} />
-        <button type="submit" name="decision" value="approve" className={button}>Aprobar</button>
-        <button type="submit" name="decision" value="deny" className={buttonSecondary}>Cancelar</button>
+        <SubmitButton className={button} name="decision" value="approve" pending={t.consent.approving}>
+          {t.consent.approve}
+        </SubmitButton>
+        <SubmitButton className={buttonSecondary} name="decision" value="deny" pending={t.consent.deny}>
+          {t.consent.deny}
+        </SubmitButton>
       </form>
       <SwitchAccount email={user.email} next={`/oauth/consent?pending=${id}`} />
     </Shell>

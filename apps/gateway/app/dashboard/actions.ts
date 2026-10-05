@@ -16,7 +16,7 @@ export async function disconnectAction(formData: FormData): Promise<void> {
     await disconnectModule(user.id, mod.id);
   } catch (e) {
     console.error("dashboard/disconnect", toSafeError(e));
-    redirect(`/dashboard?error=disconnect_failed&module=${encodeURIComponent(mod.id)}`);
+    redirect(`/dashboard?error=disconnect_failed&failed=${encodeURIComponent(mod.id)}`);
   }
   redirect(`/dashboard?disconnected=${encodeURIComponent(mod.id)}`);
 }

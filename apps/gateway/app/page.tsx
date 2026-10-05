@@ -1,15 +1,21 @@
+import { CopyCommand } from "../lib/auth/client-ui";
 import { Shell } from "../lib/auth/ui";
+import { t } from "../lib/copy";
 
 export default function Home() {
   return (
-    <Shell title="Google Gateway">
-      <p className="dim">Gateway MCP + CLI hacia Google. Solo lectura.</p>
+    <Shell title={t.home.title}>
+      <p className="dim">{t.home.body}</p>
+      <h2 className="section">{t.home.start}</h2>
+      <CopyCommand
+        command="npx -y @lucasleguizamo/concat login"
+        label={t.dashboard.cliLabel}
+        copy={t.dashboard.copy}
+        copied={t.dashboard.copied}
+      />
       <div className="actions">
-        <a href="/dashboard" className="btn btn--primary">
-          Ver mis modulos
-        </a>
-        <a href="https://onconcat.com" className="btn">
-          onconcat.com
+        <a href="/dashboard" className="btn">
+          {t.home.dashboard}
         </a>
       </div>
     </Shell>
