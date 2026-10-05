@@ -1,0 +1,426 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-05T02:31:06Z",
+  "title": "Design System: CONCAT Google Gateway",
+  "extensions": {
+    "colorMeta": {
+      "phosphor-black": {
+        "role": "neutral",
+        "displayName": "Phosphor Black",
+        "canonical": "#0a0c09",
+        "tonalRamp": [
+          "#252724",
+          "#4c4d4b",
+          "#727371",
+          "#989998",
+          "#b7b8b7",
+          "#d1d1d1",
+          "#e5e6e5",
+          "#f2f2f2"
+        ]
+      },
+      "crt-panel": {
+        "role": "neutral",
+        "displayName": "CRT Panel",
+        "canonical": "#10150e",
+        "tonalRamp": [
+          "#232821",
+          "#4a4e48",
+          "#717470",
+          "#989a97",
+          "#b7b8b6",
+          "#d0d1d0",
+          "#e5e6e5",
+          "#f2f2f2"
+        ]
+      },
+      "grid-line-faint": {
+        "role": "neutral",
+        "displayName": "Grid Line Faint",
+        "canonical": "#1c2619",
+        "tonalRamp": [
+          "#1f291c",
+          "#474f44",
+          "#6e756c",
+          "#969a94",
+          "#b5b9b4",
+          "#d0d2cf",
+          "#e5e6e4",
+          "#f2f2f2"
+        ]
+      },
+      "grid-line": {
+        "role": "neutral",
+        "displayName": "Grid Line",
+        "canonical": "#33452d",
+        "tonalRamp": [
+          "#1f2a1b",
+          "#41523b",
+          "#6a7765",
+          "#929c8f",
+          "#b3bab1",
+          "#ced2cd",
+          "#e4e6e3",
+          "#f1f3f1"
+        ]
+      },
+      "control-edge": {
+        "role": "neutral",
+        "displayName": "Control Edge",
+        "canonical": "#56704d",
+        "tonalRamp": [
+          "#20291c",
+          "#3f5239",
+          "#627a5a",
+          "#8d9e87",
+          "#afbbab",
+          "#ccd4c9",
+          "#e2e7e1",
+          "#f1f3f0"
+        ]
+      },
+      "phosphor-paper": {
+        "role": "neutral",
+        "displayName": "Phosphor Paper",
+        "canonical": "#d9e4d2",
+        "tonalRamp": [
+          "#252724",
+          "#4a4e48",
+          "#6f756b",
+          "#949b8f",
+          "#b2bbac",
+          "#cad4c4",
+          "#dfe9da",
+          "#eff4ec"
+        ]
+      },
+      "moss-dim": {
+        "role": "neutral",
+        "displayName": "Moss Dim",
+        "canonical": "#93a38b",
+        "tonalRamp": [
+          "#242722",
+          "#474f43",
+          "#6b7665",
+          "#8e9e87",
+          "#b0bbaa",
+          "#ccd4c8",
+          "#e3e7e1",
+          "#f1f3f0"
+        ]
+      },
+      "moss-faint": {
+        "role": "neutral",
+        "displayName": "Moss Faint",
+        "canonical": "#7d8c75",
+        "tonalRamp": [
+          "#232821",
+          "#474f42",
+          "#6a7763",
+          "#909d8a",
+          "#b2baad",
+          "#cdd3ca",
+          "#e3e7e2",
+          "#f1f3f0"
+        ]
+      },
+      "terminal-green": {
+        "role": "primary",
+        "displayName": "Terminal Green",
+        "canonical": "#7ee26b",
+        "tonalRamp": [
+          "#192c15",
+          "#31582a",
+          "#4a843f",
+          "#62b053",
+          "#76d464",
+          "#9ae88c",
+          "#c7f2bf",
+          "#e3f9df"
+        ]
+      },
+      "terminal-green-deep": {
+        "role": "primary",
+        "displayName": "Terminal Green Deep",
+        "canonical": "#2f6b27",
+        "tonalRamp": [
+          "#142e11",
+          "#285c21",
+          "#4f8248",
+          "#7fa47a",
+          "#a5bfa2",
+          "#c5d6c3",
+          "#dfe8de",
+          "#eff4ee"
+        ]
+      },
+      "terminal-ink": {
+        "role": "primary",
+        "displayName": "Terminal Ink",
+        "canonical": "#07120a",
+        "tonalRamp": [
+          "#1f2922",
+          "#464f49",
+          "#6e7470",
+          "#969a97",
+          "#b5b8b6",
+          "#d0d2d0",
+          "#e5e6e5",
+          "#f2f2f2"
+        ]
+      },
+      "signal-amber": {
+        "role": "secondary",
+        "displayName": "Signal Amber",
+        "canonical": "#f0b340",
+        "tonalRamp": [
+          "#32250d",
+          "#644b1b",
+          "#967028",
+          "#c89535",
+          "#f0b340",
+          "#f5ce84",
+          "#fae4bb",
+          "#fcf1dd"
+        ]
+      },
+      "signal-amber-deep": {
+        "role": "secondary",
+        "displayName": "Signal Amber Deep",
+        "canonical": "#5c4416",
+        "tonalRamp": [
+          "#32250c",
+          "#624b1e",
+          "#84714f",
+          "#a5987f",
+          "#c0b7a5",
+          "#d7d1c5",
+          "#e9e5df",
+          "#f4f2ef"
+        ]
+      },
+      "fault-coral": {
+        "role": "tertiary",
+        "displayName": "Fault Coral",
+        "canonical": "#f07a6a",
+        "tonalRamp": [
+          "#3f201c",
+          "#7e4038",
+          "#bd6053",
+          "#f18374",
+          "#f5a89d",
+          "#f9c7c0",
+          "#fbe0dc",
+          "#fdefee"
+        ]
+      },
+      "fault-coral-deep": {
+        "role": "tertiary",
+        "displayName": "Fault Coral Deep",
+        "canonical": "#5e2a22",
+        "tonalRamp": [
+          "#451f19",
+          "#71433c",
+          "#906b66",
+          "#ae9490",
+          "#c6b4b1",
+          "#dbcfcd",
+          "#ebe4e3",
+          "#f5f2f1"
+        ]
+      },
+      "hot-white": {
+        "role": "neutral",
+        "displayName": "Hot White",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#262626",
+          "#4d4d4d",
+          "#737373",
+          "#999999",
+          "#b8b8b8",
+          "#d1d1d1",
+          "#e6e6e6",
+          "#ffffff"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page title with > prompt."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Module names."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Section labels and buttons, uppercase."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All sentences and commands; max 72ch."
+      },
+      "meta": {
+        "displayName": "Meta",
+        "purpose": "Ids, counts, UTC times."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Hints, notes, secondary lines."
+      }
+    },
+    "shadows": [
+      {
+        "name": "window",
+        "value": "8px 8px 0 #33452d",
+        "purpose": "Main frame of each page."
+      },
+      {
+        "name": "button",
+        "value": "4px 4px 0 #33452d",
+        "purpose": "Button at rest (deep signal tone on colored buttons)."
+      },
+      {
+        "name": "button-hover",
+        "value": "6px 6px 0 #33452d",
+        "purpose": "Hover with translate(-2px,-2px)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "press",
+        "value": "80ms steps(2)",
+        "purpose": "Button lift/press, stepped like a sprite."
+      },
+      {
+        "name": "blink",
+        "value": "1s steps(2) infinite",
+        "purpose": "Verifying status pixel; disabled under reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow",
+        "value": "40rem"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one main action per screen (Approve, Connect with Google).",
+      "html": "<button class=\"ds-btn-primary\">Conectar con Google</button>",
+      "css": ".ds-btn-primary{font-family:Silkscreen,'Courier New',monospace;display:inline-flex;align-items:center;min-height:42px;padding:.55rem 1.1rem;border:2px solid;font-size:.9rem;font-weight:700;text-transform:uppercase;cursor:pointer;transition:transform 80ms steps(2),box-shadow 80ms steps(2);background:#7ee26b;border-color:#7ee26b;color:#07120a;box-shadow:4px 4px 0 #2f6b27}.ds-btn-primary:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #2f6b27}.ds-btn-primary:active{transform:translate(3px,3px);box-shadow:0 0 0 #2f6b27}.ds-btn-primary:focus-visible{outline:3px solid #f0b340;outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Back, Deny, Connect (neutral).",
+      "html": "<button class=\"ds-btn\">Volver</button>",
+      "css": ".ds-btn{font-family:Silkscreen,'Courier New',monospace;display:inline-flex;align-items:center;min-height:42px;padding:.55rem 1.1rem;border:2px solid;font-size:.9rem;font-weight:700;text-transform:uppercase;cursor:pointer;transition:transform 80ms steps(2),box-shadow 80ms steps(2);background:transparent;border-color:#d9e4d2;color:#d9e4d2;box-shadow:4px 4px 0 #33452d}.ds-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #33452d}.ds-btn:active{transform:translate(3px,3px);box-shadow:0 0 0 #33452d}.ds-btn:focus-visible{outline:3px solid #f0b340;outline-offset:2px}"
+    },
+    {
+      "name": "Attention Button",
+      "kind": "button",
+      "refersTo": "button-attention",
+      "description": "Fixes a state: Reconnect, Check again.",
+      "html": "<button class=\"ds-btn-amber\">Volver a comprobar</button>",
+      "css": ".ds-btn-amber{font-family:Silkscreen,'Courier New',monospace;display:inline-flex;align-items:center;min-height:42px;padding:.55rem 1.1rem;border:2px solid;font-size:.9rem;font-weight:700;text-transform:uppercase;cursor:pointer;transition:transform 80ms steps(2),box-shadow 80ms steps(2);min-height:36px;padding:.3rem .8rem;font-size:.8rem;background:transparent;border-color:#f0b340;color:#f0b340;box-shadow:3px 3px 0 #5c4416}.ds-btn-amber:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 #5c4416}.ds-btn-amber:focus-visible{outline:3px solid #f0b340;outline-offset:2px}"
+    },
+    {
+      "name": "Log Notice",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Status as a log line; no side stripe.",
+      "html": "<div class=\"ds-notice\"><span class=\"ds-tag\">[!]</span> 4 módulos requieren atención.</div>",
+      "css": ".ds-notice{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;background:#0a0c09;color:#d9e4d2;border:1px solid #5c4416;padding:.7rem .9rem;font-size:15px;max-width:72ch}.ds-tag{color:#f0b340;font-weight:700;font-size:.8rem;margin-right:.6rem}"
+    },
+    {
+      "name": "Command Block",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "CLI equivalent with copy.",
+      "html": "<div class=\"ds-cmd\"><code><span>$ </span>concat connect gsc</code><button>Copiar</button></div>",
+      "css": ".ds-cmd{display:flex;border:1px solid #33452d;background:#0a0c09;font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;max-width:22rem}.ds-cmd code{flex:1;padding:.4rem .6rem;color:#d9e4d2;font-size:.8rem}.ds-cmd span{color:#7ee26b}.ds-cmd button{border:0;border-left:1px solid #33452d;background:none;color:#93a38b;font:inherit;font-size:.75rem;padding:0 .7rem;cursor:pointer}.ds-cmd button:hover{color:#7ee26b}"
+    },
+    {
+      "name": "Identity",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Active Google account, shown before every approval.",
+      "html": "<p class=\"ds-id\"><span>Cuenta de Google</span><strong>dev@empresa.com</strong></p>",
+      "css": ".ds-id{display:flex;gap:.6rem;align-items:baseline;border:1px solid #33452d;background:#0a0c09;padding:.6rem .8rem;font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;margin:0}.ds-id span{font-size:.75rem;color:#7d8c75;text-transform:uppercase;letter-spacing:.06em}.ds-id strong{color:#fff}"
+    },
+    {
+      "name": "Code Input",
+      "kind": "input",
+      "refersTo": "input-code",
+      "description": "Hand-typed device code.",
+      "html": "<input class=\"ds-input\" placeholder=\"ABCD-EFGH\">",
+      "css": ".ds-input{min-height:42px;padding:.5rem .75rem;border:2px solid #56704d;background:#0a0c09;color:#fff;font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:1rem;letter-spacing:.12em;text-transform:uppercase;border-radius:0}.ds-input:focus{border-color:#7ee26b;outline:3px solid #f0b340;outline-offset:2px}.ds-input::placeholder{color:#7d8c75}"
+    },
+    {
+      "name": "Module Card",
+      "kind": "card",
+      "refersTo": "module-card",
+      "description": "Module with state and one fixing action.",
+      "html": "<div class=\"ds-card\"><b>Analytics 4</b><span class=\"ds-st\">Sin recursos</span><small>0 recursos · último chequeo 2026-10-04 20:10 UTC</small></div>",
+      "css": ".ds-card{display:flex;flex-direction:column;gap:.5rem;padding:1rem;border:2px solid #5c4416;background:#0a0c09;font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;color:#d9e4d2;max-width:17rem}.ds-card b{font-family:Silkscreen,'Courier New',monospace;color:#fff}.ds-st{color:#f0b340;font-size:.85rem}.ds-st::before{content:'';display:inline-block;width:8px;height:8px;background:#f0b340;margin-right:.45rem}.ds-card small{color:#7d8c75;font-size:.78rem}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Trusted Terminal",
+    "overview": "Every page reads as the output of the developer's own terminal. The user arrives from `concat login` or `concat connect`, and the window bar repeats that command (`$ concat connect gsc`). Titles start with a `>` prompt. Notices are log lines (`[ok]`, `[error]`, `[!]`). The page shows the CLI equivalent of each action next to its button. The terminal metaphor is not a costume: each element either reports true state, names the account being authorized, or gives the next command.\n\nThe density is calm and dark, built for a short stop. The user should leave within seconds. A dark phosphor field with a faint 22px dot grid holds a single framed window. Inside it, trust information comes first (which account, which client, read-only), then one primary action. Character comes from pixel display type, hard square shadows, and buttons that step down when pressed. There are no gradients, glows, or rounded corners. Color is reserved for meaning.",
+    "keyCharacteristics": [
+      "One framed \"window\" per page with a CLI title bar; the dashboard window is wider.",
+      "Pixel display type (Silkscreen) for titles, labels and buttons; JetBrains Mono for everything you read.",
+      "Square corners everywhere; depth comes from hard offset shadows only.",
+      "Green means done or primary, amber means act now, coral means failed or destructive. Everything else is moss grey.",
+      "The active Google account is always visible before any approval.",
+      "Content in ES and EN from one dictionary (`lib/copy.ts`)."
+    ],
+    "rules": [
+      {
+        "name": "The Three Signals Rule",
+        "body": "Green, amber and coral each mean one thing: done or primary, act now, failed or destructive. Decorative uses are forbidden. A beta tag is neutral (moss on a control edge), never amber.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Grey On Small Text Rule",
+        "body": "No text uses a color below #7d8c75. Every text pairing passes WCAG AA (4.5:1).",
+        "section": "colors"
+      },
+      {
+        "name": "The Mono Means Something Rule",
+        "body": "Monospace is the body voice because the content is commands, ids, scopes and timestamps, not because it looks \"technical\". Commands always appear in the `$ command | Copy` block.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hard Shadow Rule",
+        "body": "Every shadow is a solid block offset down and to the right, in the deep tone of its surface's signal color. Blur, glow and colored halos are forbidden.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** show the active Google account and \"read-only\" before any Approve or Connect.",
+      "**Do** end every flow with a \"go back to your terminal\" state.",
+      "**Do** offer the CLI equivalent (`concat connect <id>`) next to the action that it mirrors.",
+      "**Do** give each status exactly one fixing action that actually fixes it. \"No resources\" leads to Check again, never to Reconnect.",
+      "**Do** keep all copy in `lib/copy.ts` with the same shape in ES and EN.",
+      "**Do** use the service's own logo from `public/icons/<id>.svg` for each module."
+    ],
+    "donts": [
+      "**Don't** use rounded corners, gradients, glass, blur or soft shadows.",
+      "**Don't** use a colored side stripe (`border-left` wider than 1px) on notices or cards.",
+      "**Don't** use amber, green or coral decoratively (for example, on beta tags).",
+      "**Don't** put text below #7d8c75 or smaller than 0.75rem; use the type ramp (0.75 / 0.78 / 0.85rem, 15px, 1rem, display) and nothing in between.",
+      "**Don't** show a destructive button at rest; it lives only inside an opened confirmation.",
+      "**Don't** weaken security affordances for convenience: device codes are typed by hand, approval pages are never framed, and the account is always visible."
+    ]
+  }
+}

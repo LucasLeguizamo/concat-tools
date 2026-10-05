@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { getSessionUser } from "../../../lib/auth/session";
 import { button, buttonSecondary, Identity, Notice, Shell, SwitchAccount } from "../../../lib/auth/ui";
-import { moduleName, t } from "../../../lib/copy";
+import { moduleName } from "../../../lib/copy";
+import { getT } from "../../../lib/i18n";
 import { getModule } from "../../../lib/modules/registry";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ module: string }> }): Promise<Metadata> {
-  const mod = getModule((await params).module);
-  return { title: mod ? t.connect.title(moduleName(mod.id)) : t.connect.genericError };
+  const [mod, t] = [getModule((await params).module), await getT()];
+  return { title: mod ? t.connect.title(moduleName(t, mod.id)) : t.connect.genericError };
 }
 
 export default async function ConnectPage({
@@ -26,7 +27,8 @@ export default async function ConnectPage({
 
   const user = await getSessionUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(`/connect/${mod.id}`)}`);
-  const name = moduleName(mod.id);
+  const t = await getT();
+  const name = moduleName(t, mod.id);
 
   return (
     <Shell title={t.connect.title(name)} cmd={`concat connect ${mod.id}`}>
@@ -48,7 +50,7 @@ export default async function ConnectPage({
         ))}
       </ul>
       <p>
-        <strong>{t.connect.extra}:</strong> {mod.extraPermission}
+        <strong>{t.connect.extra}:</strong> {t.requirement[mod.id]}
       </p>
       <p className="dim">{t.connect.verifyNote}</p>
       <div className="actions">

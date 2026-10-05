@@ -1,8 +1,9 @@
 import { CopyCommand } from "../lib/auth/client-ui";
 import { Shell } from "../lib/auth/ui";
-import { t } from "../lib/copy";
+import { getT } from "../lib/i18n";
 
-export default function Home() {
+export default async function Home() {
+  const t = await getT();
   return (
     <Shell title={t.home.title}>
       <p className="dim">{t.home.body}</p>

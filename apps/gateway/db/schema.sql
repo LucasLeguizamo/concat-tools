@@ -98,6 +98,8 @@ ALTER TABLE device_codes ADD COLUMN IF NOT EXISTS last_polled_at timestamptz;
 ALTER TABLE device_codes ADD COLUMN IF NOT EXISTS created_at   timestamptz NOT NULL DEFAULT now();
 ALTER TABLE device_codes ADD COLUMN IF NOT EXISTS init_ip      text;
 ALTER TABLE device_codes ADD COLUMN IF NOT EXISTS init_country text;
+-- "Denegar" en /device: el siguiente poll recibe access_denied (RFC 8628 §3.5) y el codigo muere.
+ALTER TABLE device_codes ADD COLUMN IF NOT EXISTS denied_at timestamptz;
 ALTER TABLE pending_auth ADD COLUMN IF NOT EXISTS ip text;
 CREATE INDEX IF NOT EXISTS pending_auth_ip_idx ON pending_auth (ip);
 CREATE INDEX IF NOT EXISTS device_codes_ip_idx ON device_codes (init_ip);

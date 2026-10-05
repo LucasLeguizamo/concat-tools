@@ -3,14 +3,17 @@ import { resolveClientForRedirect } from "../../../lib/auth/clients";
 import { redirectWithParams } from "../../../lib/auth/http";
 import { oauthServer } from "../../../lib/auth/oauth-server";
 import { getSessionUser } from "../../../lib/auth/session";
-import { SubmitButton } from "../../../lib/auth/client-ui";
-import { button, buttonSecondary, describeScope, Identity, Shell, SwitchAccount, UUID_RE } from "../../../lib/auth/ui";
+import { CopyCommand, SubmitButton } from "../../../lib/auth/client-ui";
+import { button, buttonSecondary, Identity, Shell, SwitchAccount, UUID_RE } from "../../../lib/auth/ui";
 import { scopeAllows } from "../../../lib/bearer";
 import { getModuleStatuses } from "../../../lib/connection";
-import { moduleName, t } from "../../../lib/copy";
+import { moduleName } from "../../../lib/copy";
+import { getT } from "../../../lib/i18n";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: t.consent.title };
+export async function generateMetadata() {
+  return { title: (await getT()).consent.title };
+}
 
 async function decide(formData: FormData) {
   "use server";
@@ -42,12 +45,19 @@ export default async function ConsentPage({ searchParams }: { searchParams: Prom
   const { pending: id = "" } = await searchParams;
   const user = await getSessionUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(`/oauth/consent?pending=${id}`)}`);
+  const t = await getT();
 
   const pending = UUID_RE.test(id) ? await oauthServer().getPending(id) : null;
   if (!pending) {
     return (
       <Shell title={t.consent.expiredTitle}>
         <p>{t.consent.expiredBody}</p>
+        <CopyCommand command="concat login" label={t.dashboard.cliLabel} copy={t.dashboard.copy} copied={t.dashboard.copied} fallback={t.dashboard.copyFallback} />
+        <div className="actions">
+          <a href="/dashboard" className={buttonSecondary}>
+            {t.home.dashboard}
+          </a>
+        </div>
       </Shell>
     );
   }
@@ -59,6 +69,11 @@ export default async function ConsentPage({ searchParams }: { searchParams: Prom
     return (
       <Shell title={t.consent.invalidTitle}>
         <p>{t.consent.invalidBody}</p>
+        <div className="actions">
+          <a href="/dashboard" className={buttonSecondary}>
+            {t.home.dashboard}
+          </a>
+        </div>
       </Shell>
     );
   }
@@ -67,7 +82,7 @@ export default async function ConsentPage({ searchParams }: { searchParams: Prom
   const scope = pending.scope.split(/[\s,]+/).filter(Boolean);
   const reachable = (await getModuleStatuses(user.id, (m) => scopeAllows(scope, m)).catch(() => []))
     .filter((m) => m.status === "connected")
-    .map((m) => moduleName(m.id));
+    .map((m) => moduleName(t, m.id));
 
   return (
     <Shell title={t.consent.title}>
@@ -86,7 +101,7 @@ export default async function ConsentPage({ searchParams }: { searchParams: Prom
         </dd>
         <dt>{t.consent.scope}</dt>
         <dd>
-          {describeScope(pending.scope)}
+          {t.scope(pending.scope)}
           <span className="facts__sub">
             {reachable.length ? t.consent.today(reachable.join(", ")) : t.consent.todayNone}
           </span>

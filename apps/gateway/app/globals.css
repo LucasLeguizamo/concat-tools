@@ -8,6 +8,7 @@
   /* Borde de controles: >= 3:1 sobre bg y panel (WCAG 1.4.11). */
   --line-ctl: #56704d;
   --fg: #d9e4d2;
+  --hot: #ffffff;
   --dim: #93a38b;
   /* >= 5:1 sobre bg y panel; antes #66765f (4.0:1) no pasaba AA en texto pequeno. */
   --faint: #7d8c75;
@@ -56,7 +57,7 @@ a {
   text-underline-offset: 3px;
 }
 a:hover {
-  color: #fff;
+  color: var(--hot);
 }
 p {
   margin: 0 0 1rem;
@@ -71,7 +72,7 @@ code {
   overflow-wrap: anywhere;
 }
 strong {
-  color: #fff;
+  color: var(--hot);
 }
 ul {
   padding-left: 1.2rem;
@@ -97,12 +98,12 @@ ul {
   gap: 0.6rem;
   margin-bottom: 1.25rem;
   font-family: var(--pix);
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--fg);
   text-decoration: none;
 }
 .brand:hover {
-  color: #fff;
+  color: var(--hot);
 }
 .brand__mark {
   width: 14px;
@@ -156,7 +157,7 @@ ul {
   font-weight: 700;
   line-height: 1.15;
   margin: 0 0 1.25rem;
-  color: #fff;
+  color: var(--hot);
   text-wrap: balance;
 }
 .title::before {
@@ -167,7 +168,7 @@ ul {
   color: var(--dim);
 }
 .lede {
-  font-size: 1.05rem;
+  font-size: 1rem;
 }
 .foot {
   display: flex;
@@ -288,8 +289,8 @@ ul {
   color: var(--dim);
 }
 .code-big {
-  font-size: 1.05rem;
-  color: #fff;
+  font-size: 1rem;
+  color: var(--hot);
   letter-spacing: 0.12em;
 }
 .scopes {
@@ -319,7 +320,7 @@ ul {
   padding: 0.5rem 0.75rem;
   border: 2px solid var(--line-ctl);
   background: var(--bg);
-  color: #fff;
+  color: var(--hot);
   font-family: var(--mono);
   font-size: 1rem;
   letter-spacing: 0.12em;
@@ -462,7 +463,7 @@ ul {
   cursor: pointer;
 }
 .link:hover {
-  color: #fff;
+  color: var(--hot);
 }
 
 /* ---------- Dashboard ---------- */
@@ -551,7 +552,7 @@ ul {
   font-family: var(--pix);
   font-size: 1rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--hot);
 }
 .mod__icon {
   flex: none;
@@ -566,7 +567,7 @@ ul {
 }
 .mod__hint {
   color: var(--dim);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   overflow-wrap: anywhere;
 }
 .mod__actions {
@@ -625,15 +626,14 @@ ul {
   padding: 1rem 1.15rem;
   border: 2px solid var(--acc);
   background: var(--bg);
-  box-shadow: 6px 6px 0 var(--acc-dim);
 }
 .done p {
   margin: 0;
 }
 .done__title {
   font-family: var(--pix);
-  font-size: 1.05rem;
-  color: #fff;
+  font-size: 1rem;
+  color: var(--hot);
 }
 .done__title .notice__tag {
   color: var(--acc);
@@ -645,6 +645,11 @@ ul {
 }
 .done .done__hint {
   color: var(--acc);
+}
+.also {
+  margin: -0.5rem 0 1.25rem;
+  font-size: 0.85rem;
+  color: var(--dim);
 }
 
 /* Modulos sin conectar: filas compactas debajo de las tarjetas con estado. */
@@ -672,7 +677,7 @@ ul {
   min-width: 0;
   font-family: var(--pix);
   font-size: 0.95rem;
-  color: #fff;
+  color: var(--hot);
 }
 .row__name .tag {
   margin-left: 0.25rem;
@@ -682,11 +687,11 @@ ul {
 }
 .mod__link {
   align-self: center;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--dim);
 }
 .mod__link:hover {
-  color: #fff;
+  color: var(--hot);
 }
 .danger__actions {
   display: flex;
@@ -708,13 +713,19 @@ ul {
   padding-top: 0.5rem;
   border-top: 1px dashed var(--line-2);
 }
+.danger {
+  text-align: right;
+}
+.danger__panel {
+  text-align: left;
+}
 .danger > summary {
   display: inline-flex;
   align-items: center;
   min-height: 36px;
   list-style: none;
   color: var(--dim);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
@@ -731,7 +742,7 @@ ul {
   padding: 0.75rem;
   border: 1px solid var(--red-dim);
   background: var(--panel);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
 }
 .danger__panel p {
   margin: 0 0 0.75rem;

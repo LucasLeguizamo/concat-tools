@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(`${publicUrl()}/login?next=${encodeURIComponent(back)}`, 303);
     }
     const mod = getModule(moduleId);
-    if (!mod) return htmlError("Modulo desconocido.", 404);
+    if (!mod) return htmlError("Módulo desconocido. / Unknown module.", 404);
     // openid+email (ya otorgados, no piden nada nuevo) hacen que Google devuelva id_token
     // para comprobar que es la MISMA cuenta de Google del usuario.
     scopes = ["openid", "email", ...mod.scopes.read];

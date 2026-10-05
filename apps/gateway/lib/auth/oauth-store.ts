@@ -46,6 +46,8 @@ export type DeviceRecord = {
   createdAt: Date;
   initIp: string | null;
   initCountry: string | null;
+  /** El usuario lo denego en /device; el proximo poll recibe access_denied. */
+  deniedAt?: Date | null;
 };
 
 /**
@@ -77,6 +79,8 @@ export interface OAuthStore {
   getDeviceByUserCode(userCode: string, now: Date): Promise<DeviceRecord | null>;
   getDevice(hash: string): Promise<DeviceRecord | null>;
   approveDevice(userCode: string, userId: string, now: Date): Promise<boolean>;
+  /** Marca como denegado un device code pendiente; false si ya no estaba pendiente. */
+  denyDevice(userCode: string, now: Date): Promise<boolean>;
   touchDevice(hash: string, now: Date): Promise<void>;
   deleteDevice(hash: string): Promise<void>;
   /** Borra y devuelve el device code solo si ya fue aprobado. */
@@ -114,6 +118,7 @@ type DeviceRow = {
   created_at: Date;
   init_ip: string | null;
   init_country: string | null;
+  denied_at?: Date | null;
 };
 
 const toPending = (r: PendingRow): PendingAuth => ({
@@ -154,6 +159,7 @@ const toDevice = (r: DeviceRow): DeviceRecord => ({
   createdAt: r.created_at,
   initIp: r.init_ip,
   initCountry: r.init_country,
+  deniedAt: r.denied_at ?? null,
 });
 
 export function createPgStore(): OAuthStore {
@@ -238,7 +244,7 @@ export function createPgStore(): OAuthStore {
     },
     async getDeviceByUserCode(userCode, now) {
       const rows = await sql()<DeviceRow[]>`
-        SELECT * FROM device_codes WHERE user_code = ${userCode} AND expires_at > ${now}`;
+        SELECT * FROM device_codes WHERE user_code = ${userCode} AND expires_at > ${now} AND denied_at IS NULL`;
       return rows[0] ? toDevice(rows[0]) : null;
     },
     async getDevice(hash) {
@@ -248,7 +254,14 @@ export function createPgStore(): OAuthStore {
     async approveDevice(userCode, userId, now) {
       const rows = await sql()`
         UPDATE device_codes SET user_id = ${userId}
-        WHERE user_code = ${userCode} AND user_id IS NULL AND expires_at > ${now}
+        WHERE user_code = ${userCode} AND user_id IS NULL AND denied_at IS NULL AND expires_at > ${now}
+        RETURNING user_code`;
+      return rows.length === 1;
+    },
+    async denyDevice(userCode, now) {
+      const rows = await sql()`
+        UPDATE device_codes SET denied_at = ${now}
+        WHERE user_code = ${userCode} AND user_id IS NULL AND denied_at IS NULL AND expires_at > ${now}
         RETURNING user_code`;
       return rows.length === 1;
     },

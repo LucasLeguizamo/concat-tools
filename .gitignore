@@ -11,5 +11,6 @@ next-env.d.ts
 .DS_Store
 .vercel
 
-# Impeccable: snapshots locales de critique/live
-.impeccable/
+# Impeccable: snapshots locales (design.json si se versiona)
+**/.impeccable/critique/
+**/.impeccable/live/

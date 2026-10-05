@@ -12,12 +12,15 @@ import {
   verifyDeviceConfirm,
 } from "../../lib/auth/session";
 import { SubmitButton } from "../../lib/auth/client-ui";
-import { button, describeScope, Identity, Notice, Shell, SwitchAccount } from "../../lib/auth/ui";
-import { t } from "../../lib/copy";
+import { button, Done, Identity, Notice, Shell, SwitchAccount } from "../../lib/auth/ui";
+import type { Copy } from "../../lib/copy";
+import { getT } from "../../lib/i18n";
 import { rateLimiter } from "../../lib/rate-limit";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: t.device.title };
+export async function generateMetadata() {
+  return { title: (await getT()).device.title };
+}
 
 // Anti-phishing de device code: el codigo SIEMPRE lo teclea el usuario (esta pagina ignora `?code=`),
 // y la pantalla de aprobacion muestra quien y desde donde inicio el flujo.
@@ -53,13 +56,20 @@ async function approve() {
   redirect(ok ? "/device?done=1" : "/device?error=1");
 }
 
+/** Denegar invalida el codigo de verdad: el siguiente poll de la CLI recibe access_denied (RFC 8628). */
 async function cancel() {
   "use server";
-  (await cookies()).set(deviceConfirmCookieName(), "", cookieOptions(0));
-  redirect("/device");
+  const user = await getSessionUser();
+  if (!user) redirect("/login?next=%2Fdevice");
+  const jar = await cookies();
+  const token = jar.get(deviceConfirmCookieName())?.value;
+  const userCode = token ? await verifyDeviceConfirm(token, user.id) : null;
+  jar.set(deviceConfirmCookieName(), "", cookieOptions(0));
+  if (userCode) await oauthServer().denyDevice(userCode);
+  redirect(userCode ? "/device?denied=1" : "/device");
 }
 
-function CodeForm({ error }: { error: boolean }) {
+function CodeForm({ error, t }: { error: boolean; t: Copy }) {
   return (
     <form action={submitCode} className="codeform">
       <label htmlFor="code" className="label">
@@ -90,16 +100,30 @@ function CodeForm({ error }: { error: boolean }) {
   );
 }
 
-export default async function DevicePage({ searchParams }: { searchParams: Promise<{ done?: string; error?: string }> }) {
-  // `?code=` se ignora a proposito. Solo se leen `done` y `error`.
-  const { done, error } = await searchParams;
+export default async function DevicePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ done?: string; denied?: string; error?: string }>;
+}) {
+  // `?code=` se ignora a proposito. Solo se leen `done`, `denied` y `error`.
+  const { done, denied, error } = await searchParams;
   const user = await getSessionUser();
   if (!user) redirect("/login?next=%2Fdevice");
+  const t = await getT();
 
   if (done) {
     return (
       <Shell title={t.device.doneTitle} cmd="concat login --device">
-        <Notice tone="ok">{t.device.doneBody}</Notice>
+        <Done title={t.device.doneTitle} hint={t.device.doneBody} />
+      </Shell>
+    );
+  }
+  if (denied) {
+    return (
+      <Shell title={t.device.deniedTitle} cmd="concat login --device">
+        <Notice tone="ok" title={t.device.deniedTitle}>
+          {t.device.deniedBody}
+        </Notice>
       </Shell>
     );
   }
@@ -113,7 +137,7 @@ export default async function DevicePage({ searchParams }: { searchParams: Promi
       <Shell title={t.device.title} cmd="concat login --device">
         {error ? <Notice tone="error">{t.device.codeError}</Notice> : null}
         <Identity email={user.email} label={t.dashboard.signedInAs} />
-        <CodeForm error={Boolean(error)} />
+        <CodeForm error={Boolean(error)} t={t} />
         <SwitchAccount email={user.email} next="/device" />
       </Shell>
     );
@@ -149,7 +173,7 @@ export default async function DevicePage({ searchParams }: { searchParams: Promi
         <dt>{t.device.from}</dt>
         <dd>{where}</dd>
         <dt>{t.device.scope}</dt>
-        <dd>{describeScope(device.scope)}</dd>
+        <dd>{t.scope(device.scope)}</dd>
       </dl>
       <Notice tone="warn">{t.device.warning}</Notice>
       <div className="actions">

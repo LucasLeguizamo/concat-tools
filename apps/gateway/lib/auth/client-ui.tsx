@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
 
 /** Boton de envio que se deshabilita y cambia de texto mientras la accion del servidor corre (evita doble envio). */
@@ -108,5 +109,40 @@ export function CleanUrl({ keys }: { keys: string[] }) {
     for (const k of keys) url.searchParams.delete(k);
     window.history.replaceState(null, "", url.pathname + url.search + url.hash);
   }, [keys]);
+  return null;
+}
+
+/** Cambia el idioma (cookie, sin ruta extra) y vuelve a renderizar la misma pagina en el servidor. */
+export function LangSwitch({ to, label }: { to: string; label: string }) {
+  const router = useRouter();
+  return (
+    <button
+      type="button"
+      className="link foot__lang"
+      lang={to}
+      onClick={() => {
+        document.cookie = `concat_lang=${to}; path=/; max-age=31536000; samesite=lax${location.protocol === "https:" ? "; secure" : ""}`;
+        router.refresh();
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
+/**
+ * "Verificando": relee el estado (solo la DB, sin llamar a Google) cada `seconds`, como mucho `times` veces;
+ * despues el usuario decide con "Volver a comprobar".
+ */
+export function AutoRefresh({ seconds, times }: { seconds: number; times: number }) {
+  const router = useRouter();
+  useEffect(() => {
+    let left = times;
+    const id = setInterval(() => {
+      if (left-- <= 0) return clearInterval(id);
+      if (document.visibilityState === "visible") router.refresh();
+    }, seconds * 1000);
+    return () => clearInterval(id);
+  }, [router, seconds, times]);
   return null;
 }

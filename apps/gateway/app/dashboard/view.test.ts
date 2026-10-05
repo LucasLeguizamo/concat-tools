@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ModuleStatusEntry } from "../../lib/connection";
-import { bannerFor, byUrgency } from "./view";
+import { en, es } from "../../lib/copy";
+import { bannerFor, byUrgency, hintFor } from "./view";
 
 const entry = (id: string, status: ModuleStatusEntry["status"], extra: Partial<ModuleStatusEntry> = {}) =>
   ({ id, status, last_probe_at: null, resource_count: null, last_error: null, connect_url: "#", beta: false, action: null, ...extra }) as ModuleStatusEntry;
@@ -39,5 +40,13 @@ describe("dashboard: avisos", () => {
   it("orden por urgencia: permiso perdido primero, no conectados al final", () => {
     const sorted = [entry("a", "not_connected"), entry("b", "connected"), entry("c", "scope_lost"), entry("d", "authorized")].sort(byUrgency);
     expect(sorted.map((s) => s.id)).toEqual(["c", "d", "b", "a"]);
+  });
+
+  it("pistas localizadas: en EN no se filtra el last_error del servidor (espanol); en ES si, por ser mas especifico", () => {
+    const ga4 = entry("ga4", "no_resources", { last_error: "Tu cuenta no ve ninguna propiedad." });
+    expect(hintFor(ga4, es)).toBe("Tu cuenta no ve ninguna propiedad.");
+    expect(hintFor(ga4, en)).toContain("Viewer role");
+    expect(hintFor(entry("gsc", "connected"), en)).toBeNull();
+    expect(bannerFor({ checked: "ga4" }, [ga4], en)?.body).toContain("Viewer role");
   });
 });

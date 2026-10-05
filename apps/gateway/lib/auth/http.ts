@@ -1,4 +1,4 @@
-import { t } from "../copy";
+import { en, es } from "../copy";
 import { isIP } from "node:net";
 import { getEnv } from "../env";
 
@@ -114,15 +114,15 @@ const escapeHtml = (s: string) =>
 /** Pagina de error para fallos que NO deben redirigir (client_id o redirect_uri no confiables). */
 export function htmlError(message: string, status = 400, extraHeaders: Record<string, string> = {}): Response {
   return new Response(
-    `<!doctype html><html lang="${t.lang}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(t.error.title)} · CONCAT Gateway</title>` +
+    `<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(es.error.title)} · CONCAT Gateway</title>` +
       `<body style="margin:0;background:#0a0c09;color:#d9e4d2;font:15px/1.6 ui-monospace,'SF Mono',Menlo,monospace">` +
       `<main style="max-width:36rem;margin:0 auto;padding:clamp(1.5rem,6vw,4rem) 16px">` +
       `<p style="margin:0 0 1.25rem;font-weight:700;letter-spacing:.08em">CONCAT <small style="font-weight:400;color:#93a38b">google gateway</small></p>` +
       `<section style="border:2px solid #33452d;background:#10150e;padding:1.25rem 1.5rem">` +
-      `<p style="margin:0 0 .5rem;color:#f07a6a">[error]</p><h1 style="margin:0 0 .75rem;font-size:1.3rem;color:#fff">${escapeHtml(t.error.title)}</h1>` +
+      `<p style="margin:0 0 .5rem;color:#f07a6a">[error]</p><h1 style="margin:0 0 .75rem;font-size:1.4rem;color:#fff">${escapeHtml(es.error.title)} <span lang="en" style="color:#93a38b;font-weight:400">/ ${escapeHtml(en.error.title)}</span></h1>` +
       `<p style="margin:0 0 1rem">${escapeHtml(message)}</p>` +
-      `<p style="margin:0;color:#93a38b">${escapeHtml(t.error.next)} <code style="color:#d9e4d2">concat login</code>).</p>` +
-      `</section><p style="margin-top:1rem;font-size:.85rem"><a style="color:#7ee26b" href="${t.docsUrl}">${escapeHtml(t.help)}</a></p>` +
+      `<p style="margin:0;color:#93a38b">${escapeHtml(es.error.next)} <code style="color:#d9e4d2">concat login</code>).</p><p lang="en" style="margin:.5rem 0 0;color:#93a38b">${escapeHtml(en.error.next)} <code style="color:#d9e4d2">concat login</code>).</p>` +
+      `</section><p style="margin-top:1rem;font-size:.85rem"><a style="color:#7ee26b" href="${es.docsUrl}">${escapeHtml(es.help)}</a> · <a lang="en" style="color:#7ee26b" href="${en.docsUrl}">${escapeHtml(en.help)}</a></p>` +
       `</main></body></html>`,
     {
       status,

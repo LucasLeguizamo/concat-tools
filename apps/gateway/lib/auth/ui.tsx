@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { t } from "../copy";
+import { COPY, type Lang } from "../copy";
+import { getT } from "../i18n";
+import { LangSwitch } from "./client-ui";
 
 /** Clases de boton (app/globals.css). */
 export const button = "btn btn--primary";
@@ -19,7 +21,7 @@ export function Brand() {
  * Ventana de terminal centrada para los pasos de auth. `cmd` es el comando de la CLI que trajo al usuario
  * aqui (barra de la ventana): la pagina se lee como la continuacion de su terminal.
  */
-export function Shell({ title, cmd, children, wide }: { title: string; cmd?: string; children: ReactNode; wide?: boolean }) {
+export async function Shell({ title, cmd, children, wide }: { title: string; cmd?: string; children: ReactNode; wide?: boolean }) {
   return (
     <main className={wide ? "page" : "page page--narrow"}>
       <Brand />
@@ -40,12 +42,16 @@ export function Shell({ title, cmd, children, wide }: { title: string; cmd?: str
   );
 }
 
-export function Footer() {
+export async function Footer() {
+  const t = await getT();
+  const other: Lang = t.lang === "es" ? "en" : "es";
   return (
     <footer className="foot">
       <a href={t.docsUrl}>{t.help}</a>
       <span aria-hidden>·</span>
       <a href="https://onconcat.com">onconcat.com</a>
+      <span aria-hidden>·</span>
+      <LangSwitch to={other} label={COPY[other].langName} />
     </footer>
   );
 }
@@ -62,11 +68,9 @@ export function Identity({ email, label }: { email: string; label: string }) {
 
 export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** `*` -> texto legible; ids de modulo tal cual. */
-export const describeScope = (scope: string) => t.scope(scope);
-
 /** Cierra la sesion del gateway y vuelve a `next` tras elegir otra cuenta de Google. */
-export function SwitchAccount({ email, next }: { email: string; next: string }) {
+export async function SwitchAccount({ email, next }: { email: string; next: string }) {
+  const t = await getT();
   return (
     <form method="post" action="/logout" className="switch">
       <input type="hidden" name="next" value={next} />
@@ -102,6 +106,22 @@ export function Notice({ tone, title, children }: { tone: "ok" | "error" | "warn
           {children}
         </div>
       )}
+    </div>
+  );
+}
+
+/** Cierre feliz de un flujo ("listo, vuelve a tu terminal"): se distingue de cualquier aviso. */
+export function Done({ title, body, hint }: { title: string; body?: string; hint: string }) {
+  return (
+    <div className="done" role="status">
+      <p className="done__title">
+        <span className="notice__tag" aria-hidden>
+          ok
+        </span>
+        {title}
+      </p>
+      {body ? <p>{body}</p> : null}
+      <p className="done__hint">{hint}</p>
     </div>
   );
 }
