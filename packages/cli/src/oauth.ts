@@ -228,7 +228,7 @@ export async function loginLoopback(md: ServerMetadata, net: Net, io: LoginIO): 
       code_challenge_method: "S256",
       state,
     }).toString();
-    io.log("Abriendo el navegador para iniciar sesión. Si no se abre, visita:");
+    io.log("Link para iniciar sesión (ábrelo en este equipo; si el navegador no se abre, cópialo):");
     io.log(`  ${auth.toString()}`);
     io.openBrowser(auth.toString());
 

@@ -317,6 +317,11 @@ export function createOAuthServer(store: OAuthStore, clock: () => number = Date.
       return userCode ? store.approveDevice(userCode, userId, nowDate()) : false;
     },
 
+    async denyDevice(userCodeInput: string): Promise<boolean> {
+      const userCode = normalizeUserCode(userCodeInput);
+      return userCode ? store.denyDevice(userCode, nowDate()) : false;
+    },
+
     async pollDevice(p: { deviceCode: string; clientId: string }): Promise<TokenResponse> {
       const hash = hashToken(p.deviceCode);
       const rec = await store.getDevice(hash);
@@ -330,6 +335,10 @@ export function createOAuthServer(store: OAuthStore, clock: () => number = Date.
       if (rec.lastPolledAt && clock() - rec.lastPolledAt.getTime() < DEVICE_INTERVAL_S * 1000) {
         await store.touchDevice(hash, nowDate());
         throw new OAuthError("slow_down", "Consulta con menos frecuencia (suma 5 s al intervalo)");
+      }
+      if (rec.deniedAt) {
+        await store.deleteDevice(hash);
+        throw new OAuthError("access_denied", "El usuario denego la autorizacion");
       }
       await store.touchDevice(hash, nowDate());
       if (!rec.userId) throw new OAuthError("authorization_pending", "Esperando que el usuario apruebe");

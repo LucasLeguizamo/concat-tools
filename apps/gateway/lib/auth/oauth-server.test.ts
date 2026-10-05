@@ -87,7 +87,7 @@ function memoryStore() {
       ).length;
     },
     async getDeviceByUserCode(userCode, now) {
-      return [...devices.values()].find((d) => d.userCode === userCode && d.expiresAt > now) ?? null;
+      return [...devices.values()].find((d) => d.userCode === userCode && d.expiresAt > now && !d.deniedAt) ?? null;
     },
     async getDevice(hash) {
       return devices.get(hash) ?? null;
@@ -96,6 +96,12 @@ function memoryStore() {
       const d = await store.getDeviceByUserCode(userCode, now);
       if (!d || d.userId) return false;
       d.userId = userId;
+      return true;
+    },
+    async denyDevice(userCode, now) {
+      const d = await store.getDeviceByUserCode(userCode, now);
+      if (!d || d.userId) return false;
+      d.deniedAt = now;
       return true;
     },
     async touchDevice(hash, now) {
@@ -469,6 +475,18 @@ describe("device flow", () => {
     await poll(d.device_code);
     now += 6_000;
     expect(await errCode(poll(d.device_code))).toBe("invalid_grant");
+  });
+
+  it("Denegar en /device: el siguiente poll recibe access_denied, el codigo muere y ya no se puede aprobar", async () => {
+    const d = await server.startDevice({ clientId: "concat-cli", scope: ["*"], ip: "203.0.113.9", country: "AR" });
+    expect(await server.denyDevice(d.user_code.toLowerCase())).toBe(true);
+    expect(await server.approveDevice(d.user_code, "u")).toBe(false);
+    expect(await server.lookupDevice(d.user_code)).toBeNull();
+    now += 6_000;
+    expect(await errCode(poll(d.device_code))).toBe("access_denied");
+    now += 6_000;
+    expect(await errCode(poll(d.device_code))).toBe("invalid_grant"); // ya borrado
+    expect(await server.denyDevice(d.user_code)).toBe(false);
   });
 
   it("expired_token tras 600 s, y el user_code expirado ya no se aprueba", async () => {

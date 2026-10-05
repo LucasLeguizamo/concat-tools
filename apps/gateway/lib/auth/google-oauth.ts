@@ -112,6 +112,8 @@ export function buildAuthUrl(p: {
   scopes: string[];
   loginHint?: string;
   forceConsent?: boolean;
+  /** Muestra el selector de cuentas de Google (login: el usuario puede tener varias). */
+  selectAccount?: boolean;
 }): string {
   const q = new URLSearchParams({
     client_id: getEnv().GOOGLE_CLIENT_ID,
@@ -125,7 +127,8 @@ export function buildAuthUrl(p: {
     access_type: "offline",
     include_granted_scopes: "true",
   });
-  if (p.forceConsent) q.set("prompt", "consent");
+  const prompt = [p.forceConsent && "consent", p.selectAccount && "select_account"].filter(Boolean).join(" ");
+  if (prompt) q.set("prompt", prompt);
   if (p.loginHint) q.set("login_hint", p.loginHint);
   return `${AUTH_ENDPOINT}?${q.toString()}`;
 }

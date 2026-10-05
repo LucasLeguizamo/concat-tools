@@ -355,6 +355,84 @@ describe("login / logout / config", () => {
   });
 });
 
+describe("perfiles (varias cuentas) y --copy", () => {
+  const tokenRoute: Route = (u) =>
+    u.pathname === "/oauth/token" ? json({ access_token: "AT-B", token_type: "Bearer", expires_in: 3600, refresh_token: "RT-B" }) : undefined;
+
+  it("login --copy no abre el navegador, copia el link y guarda la sesión bajo el perfil", async () => {
+    const h = harness({ creds: null, routes: [tokenRoute] });
+    // El "otro navegador": recibe el link copiado y completa el callback loopback real.
+    h.deps.copy = async (link) => {
+      h.copied.push(link);
+      const auth = new URL(link);
+      const cb = new URL(auth.searchParams.get("redirect_uri")!);
+      cb.search = new URLSearchParams({ code: "c1", state: auth.searchParams.get("state")! }).toString();
+      setTimeout(() => void fetch(cb), 0);
+      return true;
+    };
+    expect(await run(["login", "--copy", "--profile", "cliente-b"], h.deps)).toBe(0);
+    expect(h.opened).toEqual([]);
+    expect(h.copied[0]).toContain(`${GATEWAY}/oauth/authorize?`);
+    expect(h.err.join("")).toContain("Link copiado");
+    expect(h.store.byKey.get(`${GATEWAY}#cliente-b`)).toMatchObject({ access_token: "AT-B" });
+    expect(h.store.creds).toBeNull(); // la sesión por defecto no se toca
+  });
+
+  it("cada perfil usa sus propias credenciales: --profile > CONCAT_PROFILE > .concat-profile", async () => {
+    const { mkdtempSync, mkdirSync, writeFileSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const { join } = await import("node:path");
+    const root = mkdtempSync(join(tmpdir(), "concat-profile-"));
+    writeFileSync(join(root, ".concat-profile"), "proyecto-x\n");
+    mkdirSync(join(root, "sub"));
+
+    const auth = (h: ReturnType<typeof harness>) =>
+      (h.deps.net.fetch as unknown as { calls: Array<{ url: string; init: RequestInit }> }).calls
+        .filter((c) => c.url.endsWith("/api/status"))
+        .map((c) => (c.init.headers as Record<string, string>).authorization);
+    const seed = (h: ReturnType<typeof harness>) => {
+      for (const p of ["proyecto-x", "env-p", "flag-p"]) {
+        h.store.byKey.set(`${GATEWAY}#${p}`, { access_token: `at-${p}`, expires_at: h.clock.t + 3_600_000 });
+      }
+    };
+
+    const h1 = harness({ routes: [statusRoute([])], cwd: join(root, "sub") });
+    seed(h1);
+    expect(await run(["status"], h1.deps)).toBe(0); // archivo encontrado subiendo directorios
+    const h2 = harness({ routes: [statusRoute([])], cwd: join(root, "sub"), env: { CONCAT_PROFILE: "env-p" } });
+    seed(h2);
+    expect(await run(["status"], h2.deps)).toBe(0);
+    expect(await run(["status", "--profile=flag-p"], h2.deps)).toBe(0);
+    expect(await run(["status", "--profile", "default"], h2.deps)).toBe(0); // "default" = sesión sin perfil
+    expect([...auth(h1), ...auth(h2)]).toEqual(["Bearer at-proyecto-x", "Bearer at-env-p", "Bearer at-flag-p", "Bearer at-1"]);
+  });
+
+  it("perfil sin sesión => exit 3; nombre inválido => exit 2", async () => {
+    const h = harness({ routes: [statusRoute([])] });
+    expect(await run(["status", "--profile", "nuevo"], h.deps)).toBe(3);
+    expect(await run(["status", "--profile", "../x"], h.deps)).toBe(2);
+    expect(await run(["login", "--device", "--copy"], h.deps)).toBe(2);
+  });
+
+  it("logout --profile solo borra ese perfil", async () => {
+    const h = harness();
+    h.store.byKey.set(`${GATEWAY}#b`, { access_token: "x", expires_at: 0 });
+    expect(await run(["logout", "--profile", "b"], h.deps)).toBe(0);
+    expect(h.store.byKey.has(`${GATEWAY}#b`)).toBe(false);
+    expect(h.store.creds).not.toBeNull();
+  });
+
+  it("connect --copy copia el link del módulo en vez de abrirlo", async () => {
+    let n = 0;
+    const h = harness({
+      routes: [(u) => (u.pathname === "/api/status" ? json({ modules: [{ id: "gsc", status: n++ === 0 ? "disconnected" : "connected" }] }) : undefined)],
+    });
+    expect(await run(["connect", "gsc", "--copy"], h.deps)).toBe(0);
+    expect(h.opened).toEqual([]);
+    expect(h.copied).toEqual([`${GATEWAY}/google/start?module=gsc`]);
+  });
+});
+
 describe("CONCAT_TOKEN (token de API para CI)", () => {
   const TOKEN = `cgw_${"a".repeat(43)}`;
   const calls = (h: ReturnType<typeof harness>) =>

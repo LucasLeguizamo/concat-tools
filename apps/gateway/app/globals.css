@@ -1,0 +1,785 @@
+/* Mismos tokens que la landing (apps/web): terminal + pixel. */
+:root {
+  color-scheme: dark;
+  --bg: #0a0c09;
+  --panel: #10150e;
+  --line: #1c2619;
+  --line-2: #33452d;
+  /* Borde de controles: >= 3:1 sobre bg y panel (WCAG 1.4.11). */
+  --line-ctl: #56704d;
+  --fg: #d9e4d2;
+  --hot: #ffffff;
+  --dim: #93a38b;
+  /* >= 5:1 sobre bg y panel; antes #66765f (4.0:1) no pasaba AA en texto pequeno. */
+  --faint: #7d8c75;
+  --acc: #7ee26b;
+  --acc-dim: #2f6b27;
+  --acc-ink: #07120a;
+  --amber: #f0b340;
+  --amber-dim: #5c4416;
+  --red: #f07a6a;
+  --red-dim: #5e2a22;
+  --mono: var(--font-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --pix: var(--font-pixel), "Courier New", monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+body {
+  min-height: 100dvh;
+  background-image: radial-gradient(var(--line) 1px, transparent 1px);
+  background-size: 22px 22px;
+  caret-color: var(--acc);
+  scrollbar-color: var(--line-2) var(--bg);
+}
+
+::selection {
+  background: var(--acc);
+  color: var(--acc-ink);
+}
+
+a {
+  color: var(--acc);
+  text-underline-offset: 3px;
+}
+a:hover {
+  color: var(--hot);
+}
+p {
+  margin: 0 0 1rem;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  color: var(--dim);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 0.05rem 0.35rem;
+  overflow-wrap: anywhere;
+}
+strong {
+  color: var(--hot);
+}
+ul {
+  padding-left: 1.2rem;
+}
+:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 2px;
+}
+
+/* ---------- Ventana de terminal ---------- */
+.page {
+  width: 100%;
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 6vw, 4rem) 16px;
+}
+.page--narrow {
+  max-width: 38rem;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  font-family: var(--pix);
+  font-size: 1rem;
+  color: var(--fg);
+  text-decoration: none;
+}
+.brand:hover {
+  color: var(--hot);
+}
+.brand__mark {
+  width: 14px;
+  height: 14px;
+  background: var(--acc);
+  box-shadow: 4px 4px 0 var(--acc-dim);
+}
+.brand small {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--faint);
+}
+.win {
+  border: 2px solid var(--line-2);
+  background: var(--panel);
+  box-shadow: 8px 8px 0 var(--line-2);
+}
+.win__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.9rem;
+  border-bottom: 2px solid var(--line-2);
+  color: var(--faint);
+  font-size: 0.8rem;
+}
+.win__bar i {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  background: var(--line-2);
+}
+.win__bar span {
+  margin-left: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.win__body {
+  padding: clamp(1.1rem, 4vw, 1.75rem);
+}
+.win__body > :first-child {
+  margin-top: 0;
+}
+.win__body > :last-child {
+  margin-bottom: 0;
+}
+.title {
+  font-family: var(--pix);
+  font-size: clamp(1.4rem, 4vw, 1.9rem);
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0 0 1.25rem;
+  color: var(--hot);
+  text-wrap: balance;
+}
+.title::before {
+  content: "> " / "";
+  color: var(--acc);
+}
+.dim {
+  color: var(--dim);
+}
+.lede {
+  font-size: 1rem;
+}
+.foot {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+  font-size: 0.8rem;
+  color: var(--faint);
+}
+.foot a {
+  color: var(--dim);
+}
+
+/* ---------- Identidad: cuenta activa ---------- */
+.identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.6rem;
+  margin: 0 0 1.25rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--line-2);
+  background: var(--bg);
+}
+.identity__label {
+  font-size: 0.75rem;
+  color: var(--faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.identity__email {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.switch {
+  margin: 1.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--dim);
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Avisos: linea de log, sin franja lateral ---------- */
+.notice {
+  margin: 0 0 1.25rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--line-2);
+  background: var(--bg);
+}
+.notice > div {
+  max-width: 72ch;
+}
+.section__note,
+.done p {
+  max-width: 72ch;
+}
+.notice__cmd {
+  display: block;
+  margin-top: 0.6rem;
+  color: var(--dim);
+}
+.notice__cmd .cmd {
+  margin-top: 0.4rem;
+  max-width: 36rem;
+}
+.notice__body {
+  margin-top: 0.35rem;
+  color: var(--dim);
+}
+.notice__tag {
+  margin-right: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.notice__tag::before {
+  content: "[";
+}
+.notice__tag::after {
+  content: "]";
+}
+.notice[data-tone="ok"] {
+  border-color: var(--acc-dim);
+}
+.notice[data-tone="ok"] .notice__tag {
+  color: var(--acc);
+}
+.notice[data-tone="warn"] {
+  border-color: var(--amber-dim);
+}
+.notice[data-tone="warn"] .notice__tag {
+  color: var(--amber);
+}
+.notice[data-tone="error"] {
+  border-color: var(--red-dim);
+}
+.notice[data-tone="error"] .notice__tag {
+  color: var(--red);
+}
+
+/* ---------- Listas de hechos (consent, device) ---------- */
+.facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.45rem 1.25rem;
+  margin: 0 0 1.25rem;
+}
+.facts dt {
+  color: var(--faint);
+  font-size: 0.85rem;
+}
+.facts dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.facts__sub {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--dim);
+}
+.code-big {
+  font-size: 1rem;
+  color: var(--hot);
+  letter-spacing: 0.12em;
+}
+.scopes {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+/* ---------- Formularios ---------- */
+.label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--dim);
+}
+.help {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  color: var(--dim);
+}
+.input {
+  min-height: 42px;
+  width: 13rem;
+  max-width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--line-ctl);
+  background: var(--bg);
+  color: var(--hot);
+  font-family: var(--mono);
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.input::placeholder {
+  color: var(--faint);
+}
+.input:focus {
+  border-color: var(--acc);
+}
+.input[aria-invalid="true"] {
+  border-color: var(--red);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 1.5rem;
+}
+.actions--tight {
+  margin-top: 0;
+}
+
+/* ---------- Comando de la CLI copiable ---------- */
+.cmd {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  border: 1px solid var(--line-2);
+  background: var(--bg);
+}
+.cmd code {
+  flex: 1;
+  min-width: 0;
+  padding: 0.4rem 0.6rem;
+  border: 0;
+  background: none;
+  color: var(--fg);
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+.cmd__prompt {
+  color: var(--acc);
+}
+.cmd__copy {
+  flex: none;
+  padding: 0 0.7rem;
+  border: 0;
+  border-left: 1px solid var(--line-2);
+  background: none;
+  color: var(--dim);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.cmd__copy:hover {
+  color: var(--acc);
+}
+
+/* ---------- Botones ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0.55rem 1.1rem;
+  border: 2px solid var(--fg);
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--pix);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 var(--line-2);
+  transition: transform 80ms steps(2), box-shadow 80ms steps(2);
+}
+.btn:hover {
+  color: var(--fg);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--line-2);
+}
+.btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--line-2);
+}
+.btn:disabled {
+  cursor: progress;
+  opacity: 0.7;
+  transform: none;
+  box-shadow: 0 0 0 var(--line-2);
+}
+.btn--primary {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: var(--acc-ink);
+  box-shadow: 4px 4px 0 var(--acc-dim);
+}
+.btn--primary:hover {
+  color: var(--acc-ink);
+  box-shadow: 6px 6px 0 var(--acc-dim);
+}
+.btn--amber {
+  border-color: var(--amber);
+  color: var(--amber);
+  box-shadow: 4px 4px 0 var(--amber-dim);
+}
+.btn--amber:hover {
+  color: var(--amber);
+  box-shadow: 6px 6px 0 var(--amber-dim);
+}
+.btn--red {
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--acc-ink);
+  box-shadow: 4px 4px 0 var(--red-dim);
+}
+.btn--red:hover {
+  color: var(--acc-ink);
+  box-shadow: 6px 6px 0 var(--red-dim);
+}
+.btn--sm {
+  min-height: 36px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  box-shadow: 3px 3px 0 var(--line-2);
+}
+.link {
+  font: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--acc);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.link:hover {
+  color: var(--hot);
+}
+
+/* ---------- Dashboard ---------- */
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  margin-bottom: 1.5rem;
+}
+.head .title {
+  margin: 0 0 0.35rem;
+}
+.counts {
+  margin: 0;
+  color: var(--dim);
+  font-size: 0.85rem;
+}
+.who {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 0.85rem;
+}
+.who .identity {
+  margin: 0;
+}
+.section {
+  margin: 2rem 0 0.9rem;
+  font-family: var(--pix);
+  font-size: 0.9rem;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.section__note {
+  margin: -0.4rem 0 1rem;
+  font-size: 0.85rem;
+  color: var(--dim);
+}
+.mods {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  align-items: start;
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.mod {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 2px solid var(--line-2);
+  background: var(--bg);
+}
+.mod p {
+  margin: 0;
+}
+.mod[data-status="connected"] {
+  border-color: var(--acc-dim);
+}
+.mod[data-status="scope_lost"],
+.mod[data-status="expired"],
+.mod[data-status="no_resources"] {
+  border-color: var(--amber-dim);
+}
+.mod__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.mod__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--pix);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--hot);
+}
+.mod__icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+.mod__id,
+.mod__meta {
+  color: var(--faint);
+  font-size: 0.78rem;
+}
+.mod__hint {
+  color: var(--dim);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.mod__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem 1rem;
+  padding-top: 0.25rem;
+}
+.mod__actions:empty {
+  display: none;
+}
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  color: var(--dim);
+}
+.status::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--faint);
+}
+.status[data-tone="ok"] {
+  color: var(--acc);
+}
+.status[data-tone="ok"]::before {
+  background: var(--acc);
+}
+.status[data-tone="warn"] {
+  color: var(--amber);
+}
+.status[data-tone="warn"]::before {
+  background: var(--amber);
+}
+.status[data-tone="wait"]::before {
+  background: var(--amber);
+  animation: blink 1s steps(2) infinite;
+}
+/* Beta en tono neutro: el ambar queda solo para "requiere accion". */
+.tag {
+  font-family: var(--pix);
+  font-size: 0.75rem;
+  color: var(--dim);
+  border: 1px solid var(--line-ctl);
+  padding: 0 0.35rem;
+  text-transform: uppercase;
+}
+
+/* Cierre feliz: "listo, vuelve a tu terminal" se distingue de cualquier aviso. */
+.done {
+  margin: 0 0 1.25rem;
+  padding: 1rem 1.15rem;
+  border: 2px solid var(--acc);
+  background: var(--bg);
+}
+.done p {
+  margin: 0;
+}
+.done__title {
+  font-family: var(--pix);
+  font-size: 1rem;
+  color: var(--hot);
+}
+.done__title .notice__tag {
+  color: var(--acc);
+  font-family: var(--mono);
+}
+.done p + p {
+  margin-top: 0.35rem;
+  color: var(--dim);
+}
+.done .done__hint {
+  color: var(--acc);
+}
+.also {
+  margin: -0.5rem 0 1.25rem;
+  font-size: 0.85rem;
+  color: var(--dim);
+}
+
+/* Modulos sin conectar: filas compactas debajo de las tarjetas con estado. */
+.rows {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  border-top: 1px solid var(--line-2);
+}
+.mods + .rows {
+  margin-top: 1.25rem;
+}
+.row {
+  display: grid;
+  grid-template-columns: minmax(10rem, 14rem) minmax(0, 22rem) auto;
+  align-items: center;
+  gap: 0.6rem 1.25rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--line-2);
+}
+.row__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  font-family: var(--pix);
+  font-size: 0.95rem;
+  color: var(--hot);
+}
+.row__name .tag {
+  margin-left: 0.25rem;
+}
+.row .btn {
+  justify-self: end;
+}
+.mod__link {
+  align-self: center;
+  font-size: 0.85rem;
+  color: var(--dim);
+}
+.mod__link:hover {
+  color: var(--hot);
+}
+.danger__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Desconectar: dos pasos sin JS (<details>), el segundo explica la consecuencia. */
+.danger {
+  margin-top: 0.15rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--line-2);
+}
+.danger {
+  text-align: right;
+}
+.danger__panel {
+  text-align: left;
+}
+.danger > summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  list-style: none;
+  color: var(--dim);
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.danger > summary::-webkit-details-marker {
+  display: none;
+}
+.danger > summary:hover,
+.danger[open] > summary {
+  color: var(--red);
+}
+.danger__panel {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--red-dim);
+  background: var(--panel);
+  font-size: 0.85rem;
+}
+.danger__panel p {
+  margin: 0 0 0.75rem;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@media (max-width: 40rem) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .row .cmd {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .who {
+    align-items: stretch;
+    width: 100%;
+  }
+  .facts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.1rem;
+  }
+  .facts dd {
+    margin-bottom: 0.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+  .status[data-tone="wait"]::before {
+    animation: none;
+  }
+}
