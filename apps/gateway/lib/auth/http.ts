@@ -113,7 +113,7 @@ const escapeHtml = (s: string) =>
 /** Pagina de error para fallos que NO deben redirigir (client_id o redirect_uri no confiables). */
 export function htmlError(message: string, status = 400, extraHeaders: Record<string, string> = {}): Response {
   return new Response(
-    `<!doctype html><html lang="es"><meta charset="utf-8"><title>Error</title><body style="font-family:system-ui;max-width:32rem;margin:4rem auto"><h1>No se pudo continuar</h1><p>${escapeHtml(message)}</p></body></html>`,
+    `<!doctype html><html lang="es"><meta charset="utf-8"><title>Error</title><body style="background:#0a0c09;color:#d9e4d2;font-family:ui-monospace,Menlo,monospace;max-width:32rem;margin:4rem auto;padding:0 16px"><h1 style="color:#f07a6a">No se pudo continuar</h1><p>${escapeHtml(message)}</p></body></html>`,
     {
       status,
       headers: {

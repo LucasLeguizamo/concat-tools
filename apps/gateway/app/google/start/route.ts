@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
   });
 
   const res = NextResponse.redirect(
-    buildAuthUrl({ state, nonce, codeChallenge: challenge, scopes, loginHint, forceConsent }),
+    buildAuthUrl({ state, nonce, codeChallenge: challenge, scopes, loginHint, forceConsent, selectAccount: !moduleId }),
     303,
   );
   res.cookies.set(txCookieName(), await signTx({ nonce, verifier }), cookieOptions(600, TX_COOKIE_PATH));

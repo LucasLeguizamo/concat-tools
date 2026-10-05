@@ -11,7 +11,7 @@ import {
   signDeviceConfirm,
   verifyDeviceConfirm,
 } from "../../lib/auth/session";
-import { button, describeScope, Shell } from "../../lib/auth/ui";
+import { button, describeScope, Shell, SwitchAccount } from "../../lib/auth/ui";
 import { rateLimiter } from "../../lib/rate-limit";
 
 export const dynamic = "force-dynamic";
@@ -58,7 +58,7 @@ async function cancel() {
 
 function CodeForm() {
   return (
-    <form action={submitCode} style={{ display: "flex", gap: "0.75rem" }}>
+    <form action={submitCode} className="actions">
       <input
         name="code"
         placeholder="ABCD-EFGH"
@@ -66,9 +66,9 @@ function CodeForm() {
         autoCapitalize="characters"
         maxLength={12}
         required
-        style={{ font: "inherit", padding: "0.5rem", textTransform: "uppercase" }}
+        className="input"
       />
-      <button type="submit" style={button}>Continuar</button>
+      <button type="submit" className={button}>Continuar</button>
     </form>
   );
 }
@@ -94,9 +94,10 @@ export default async function DevicePage({ searchParams }: { searchParams: Promi
   if (!device) {
     return (
       <Shell title="Autorizar un dispositivo">
-        {error && <p role="alert">Codigo no valido, expirado o demasiados intentos. Pide uno nuevo en la CLI.</p>}
+        {error && <p role="alert" className="alert">Codigo no valido, expirado o demasiados intentos. Pide uno nuevo en la CLI.</p>}
         <p>Escribe el codigo que muestra la CLI (<code>concat login</code>). No lo pegues desde un enlace que te hayan enviado.</p>
         <CodeForm />
+        <SwitchAccount email={user.email} next="/device" />
       </Shell>
     );
   }
@@ -125,14 +126,15 @@ export default async function DevicePage({ searchParams }: { searchParams: Promi
         <strong>Aprueba solo si TU iniciaste este login ahora mismo</strong> y la hora y ubicacion te resultan familiares.
         Si alguien te pidio este codigo, es un intento de robo de cuenta: cancela.
       </p>
-      <div style={{ display: "flex", gap: "0.75rem" }}>
+      <div className="actions">
         <form action={approve}>
-          <button type="submit" style={button}>Aprobar</button>
+          <button type="submit" className={button}>Aprobar</button>
         </form>
         <form action={cancel}>
-          <button type="submit" style={{ ...button, background: "#fff", color: "#111" }}>Cancelar</button>
+          <button type="submit" className="btn">Cancelar</button>
         </form>
       </div>
+      <SwitchAccount email={user.email} next="/device" />
     </Shell>
   );
 }

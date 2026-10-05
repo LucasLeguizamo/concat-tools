@@ -30,9 +30,9 @@ export default async function ConnectPage({
 
   return (
     <Shell title={`Conectar ${mod.id}`}>
-      {error && <p role="alert">{ERRORS[error] ?? "No se pudo conectar el modulo."}</p>}
+      {error && <p role="alert" className="alert">{ERRORS[error] ?? "No se pudo conectar el modulo."}</p>}
       {mod.beta && (
-        <p role="note">
+        <p role="note" className="note">
           <strong>Modulo en beta cerrada.</strong> Funciona solo para las cuentas de la lista de prueba de Google
           mientras se completa la verificacion de la app; el acceso puede caducar a los 7 dias.
         </p>
@@ -45,7 +45,7 @@ export default async function ConnectPage({
       </ul>
       <p><strong>Permiso extra necesario:</strong> {mod.extraPermission}</p>
       <p>Solo se marca como conectado cuando una consulta real devuelve datos.</p>
-      <a href={`/google/start?module=${encodeURIComponent(mod.id)}`} style={button}>
+      <a href={`/google/start?module=${encodeURIComponent(mod.id)}`} className={button}>
         Conectar con Google
       </a>
     </Shell>

@@ -20,12 +20,12 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
 
   return (
     <Shell title="Iniciar sesion">
-      {error && <p role="alert">{ERRORS[error] ?? "No se pudo iniciar sesion."}</p>}
+      {error && <p role="alert" className="alert">{ERRORS[error] ?? "No se pudo iniciar sesion."}</p>}
       <p>
         Entra con Google. Solo pedimos tu identidad (correo y perfil); cada servicio pide su propio permiso de solo
         lectura cuando lo conectas.
       </p>
-      <a href={`/google/start?next=${encodeURIComponent(target)}`} style={button}>
+      <a href={`/google/start?next=${encodeURIComponent(target)}`} className={button}>
         Continuar con Google
       </a>
     </Shell>

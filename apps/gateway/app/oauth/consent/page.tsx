@@ -3,7 +3,7 @@ import { resolveClientForRedirect } from "../../../lib/auth/clients";
 import { redirectWithParams } from "../../../lib/auth/http";
 import { oauthServer } from "../../../lib/auth/oauth-server";
 import { getSessionUser } from "../../../lib/auth/session";
-import { button, buttonSecondary, describeScope, Shell, UUID_RE } from "../../../lib/auth/ui";
+import { button, buttonSecondary, describeScope, Shell, SwitchAccount, UUID_RE } from "../../../lib/auth/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -70,11 +70,12 @@ export default async function ConsentPage({ searchParams }: { searchParams: Prom
         <li>Permisos: {describeScope(pending.scope)}</li>
       </ul>
       <p>Solo lectura. Nunca veras ni compartiras tokens de Google con la aplicacion.</p>
-      <form action={decide} style={{ display: "flex", gap: "0.75rem" }}>
+      <form action={decide} className="actions">
         <input type="hidden" name="pending" value={id} />
-        <button type="submit" name="decision" value="approve" style={button}>Aprobar</button>
-        <button type="submit" name="decision" value="deny" style={buttonSecondary}>Cancelar</button>
+        <button type="submit" name="decision" value="approve" className={button}>Aprobar</button>
+        <button type="submit" name="decision" value="deny" className={buttonSecondary}>Cancelar</button>
       </form>
+      <SwitchAccount email={user.email} next={`/oauth/consent?pending=${id}`} />
     </Shell>
   );
 }

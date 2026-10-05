@@ -58,6 +58,8 @@ describe("buildAuthUrl", () => {
 
   it("prompt=consent solo si se fuerza; login_hint opcional", () => {
     expect(url({ forceConsent: true }).searchParams.get("prompt")).toBe("consent");
+    expect(url({ selectAccount: true }).searchParams.get("prompt")).toBe("select_account");
+    expect(url({ forceConsent: true, selectAccount: true }).searchParams.get("prompt")).toBe("consent select_account");
     expect(url({ loginHint: "a@b.com" }).searchParams.get("login_hint")).toBe("a@b.com");
   });
 
