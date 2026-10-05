@@ -1,6 +1,6 @@
 {
   "name": "@lucasleguizamo/concat",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI de CONCAT Google Gateway: cliente MCP delgado, comandos generados desde tools/list.",
   "license": "MIT",
   "author": "Lucas Leguizamo <lucasleguizamo21@gmail.com>",
